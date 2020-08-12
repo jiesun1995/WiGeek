@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,50 +17,51 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
     /// <summary>
     /// 就诊记录
     /// </summary>
+    [Table("MedicalRecords")]
     public class MedicalRecords : HospitalAggregateRoot
     {
 
-        protected MedicalRecords() { }
-        public MedicalRecords(string hospitalCode, 
-            string hospitalId, 
-            int? workId, 
-            int? marriageId, 
-            int? departmentId, 
-            DateTime? admissionTime,
-            string hospitalNo, 
-            string patientName, 
-            string inputCode,
-            string sex, 
-            DateTime? birthday, 
-            string patientIdCardNo, 
-            string diagnosisName,
-            DateTime? dischargedTime, 
-            int? wardId, 
-            string contactPerson, 
-            string contactPhone, 
-            string add
-            )
-        {            
-            HospitalId = hospitalId;
-            HospitalCode = hospitalCode;
-            WorkId = workId;
-            MarriageId = marriageId;
-            DepartmentId = departmentId;
-            AdmissionTime = admissionTime;
-            HospitalNo = hospitalNo;
-            PatientName = patientName;
-            InputCode = inputCode;
-            Sex = sex;
-            Birthday = birthday;
-            PatientIdCardNo = patientIdCardNo;
-            DiagnosisName = diagnosisName;
-            DischargedTime = dischargedTime;
-            WardId = wardId;
-            ContactPerson = contactPerson;
-            ContactPhone = contactPhone;
-            Add = add;
+        //protected MedicalRecords() { }
+        //public MedicalRecords(string hospitalCode, 
+        //    string hospitalId, 
+        //    int? workId, 
+        //    int? marriageId, 
+        //    int? departmentId, 
+        //    DateTime? admissionTime,
+        //    string hospitalNo, 
+        //    string patientName, 
+        //    string inputCode,
+        //    string sex, 
+        //    DateTime? birthday, 
+        //    string patientIdCardNo, 
+        //    string diagnosisName,
+        //    DateTime? dischargedTime, 
+        //    int? wardId, 
+        //    string contactPerson, 
+        //    string contactPhone, 
+        //    string add
+        //    )
+        //{            
+        //    HospitalId = hospitalId;
+        //    HospitalCode = hospitalCode;
+        //    WorkId = workId;
+        //    MarriageId = marriageId;
+        //    DepartmentId = departmentId;
+        //    AdmissionTime = admissionTime;
+        //    HospitalNo = hospitalNo;
+        //    PatientName = patientName;
+        //    InputCode = inputCode;
+        //    Sex = sex;
+        //    Birthday = birthday;
+        //    PatientIdCardNo = patientIdCardNo;
+        //    DiagnosisName = diagnosisName;
+        //    DischargedTime = dischargedTime;
+        //    WardId = wardId;
+        //    ContactPerson = contactPerson;
+        //    ContactPhone = contactPhone;
+        //    Add = add;
             
-        }
+        //}
 
         /// <summary>
         /// 工作
@@ -129,17 +131,21 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// 家庭住址
         /// </summary>
         public string Add { get; set; }
-        /// <summary>
-        /// 体温Id
-        /// </summary>
-        public int? PhysicalSignsId { set; get; }
+        [Computed]
         public int? Age { get { return DateTime.Now.Year - Birthday?.Year; } }
+        [Computed]
         public Department Department { get; set; }
+        [Computed]
         public Marriage Marriage { get; set; }
+        [Computed]
         public List<Order> Orders { get; set; } = new List<Order>();
+        [Computed]
         public Diagnosis Diagnosis { get; set; }
+        [Computed]
         public Ward Ward { get; set; }
+        [Computed]
         public Work Work { get; set; }
-        public PhysicalSigns PhysicalSigns { get; set; }
+        [Computed]
+        public List<PhysicalSigns> PhysicalSigns { get; set; }
     }
 }

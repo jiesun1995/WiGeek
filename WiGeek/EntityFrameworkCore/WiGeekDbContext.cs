@@ -24,7 +24,9 @@ namespace WiGeek.EntityFrameworkCore
         public DbSet<Department> Departments { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderType> OrderTypes { get; set; }
-        public DbSet<Diagnosis> diagnoses { get; set; }
+        public DbSet<Diagnosis> Diagnoses { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        public DbSet<PhysicalSigns> PhysicalSigns { get; set; }
         public DbSet<MedicalRecords> MedicalRecords { get; set; }
 
         public WiGeekDbContext(DbContextOptions<WiGeekDbContext> options)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,7 @@ using Volo.Abp.AspNetCore.SignalR;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching;
+using Volo.Abp.Dapper;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using WiGeek.EntityFrameworkCore;
@@ -24,6 +26,8 @@ namespace WiGeek.Startup
        typeof(WiGeekDbEntityFrameworkModule),
        typeof(AbpAspNetCoreSignalRModule),
        typeof(AbpCachingModule),
+       typeof(AbpAutoMapperModule),
+       typeof(AbpDapperModule),
        typeof(AbpAspNetCoreMvcUiBasicThemeModule)
        )]
     public class WebModule : AbpModule
@@ -32,6 +36,8 @@ namespace WiGeek.Startup
         {
             var configuration = context.Services.GetConfiguration();
             var hostingEnvironment = context.Services.GetHostingEnvironment();
+
+            //var str = configuration.GetConnectionString("Default");
 
             context.Services.AddSwaggerGen(
                 options =>

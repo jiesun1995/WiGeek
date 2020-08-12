@@ -55,7 +55,7 @@ namespace WiGeek.Startup
             {
                 var services = scope.ServiceProvider;
                 var dataSeed = services.GetRequiredService<IReadFileDataService>();
-                dataSeed.readData<Marriage>(@"E:\work\WiGeek\WiGeek样本数据20200729\标准比赛数据集\医院数据2\婚姻字典.csv");
+                dataSeed.ReadFileWriteData();
             }
         }
     }

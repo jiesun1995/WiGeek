@@ -12,14 +12,14 @@ namespace WiGeek.Domain.MarriageAggregate
     /// </summary>
     public class Marriage:HospitalAggregateRoot
     {
-        public Marriage() { }
-        public Marriage(string hospitalCode, string hospitalId, string code, string name)
-        {
-            HospitalId = hospitalId;
-            HospitalCode = hospitalCode;
-            Code = code;
-            Name = name;
-        }
+        //public Marriage() { }
+        //public Marriage(string hospitalCode, string hospitalId, string code, string name)
+        //{
+        //    HospitalId = hospitalId;
+        //    HospitalCode = hospitalCode;
+        //    Code = code;
+        //    Name = name;
+        //}
         /// <summary>
         /// 婚姻编码
         /// </summary>

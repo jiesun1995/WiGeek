@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WiGeek.Domain.MedicalRecordsAggregate;
 using WiGeek.Domain.SeedWork;
 using WiGeek.Domain.ValueObject;
 using WiGeek.Domain.WardAggregate;
@@ -36,7 +37,7 @@ namespace WiGeek.Domain.OrderAggregate
         /// <summary>
         /// 状态
         /// </summary>
-        public string Status { get; set; }
+        public int? OrderStatusId { get; set; }
         /// <summary>
         /// 开立时间
         /// </summary>
@@ -71,6 +72,8 @@ namespace WiGeek.Domain.OrderAggregate
         public int? WardId { set; get; }
         public Ward Ward { get; set; }
         public OrderType OrderType { set; get; }
+        public MedicalRecords MedicalRecords { get; set; }
+        public OrderStatus OrderStatus { set; get; }
     }
     
 }

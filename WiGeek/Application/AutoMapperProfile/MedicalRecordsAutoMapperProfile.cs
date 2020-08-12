@@ -12,7 +12,8 @@ namespace WiGeek.Application.AutoMapperProfile
     {
         public MedicalRecordsAutoMapperProfile()
         {
-            CreateMap<MedicalRecords, CreateUpdateMedicalRecordsDto>();
+            //CreateMap<MedicalRecords, CreateUpdateMedicalRecordsDto>();
+            CreateMap<CreateUpdateMedicalRecordsDto, MedicalRecords>();
             CreateMap<MedicalRecords, MedicalRecordsDto>();
         }
     }

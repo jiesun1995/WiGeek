@@ -30,22 +30,22 @@ namespace WiGeek.Application.CommandHandlers
 
         public async Task HandleEventAsync(EntityCreatedEventData<MedicalRecords> eventData)
         {
-            _ = Task.Factory.StartNew(() =>
-               {
-                   if (eventData.Entity.Age > 10 && eventData.Entity.Age < 40 && eventData.Entity.Marriage.Name == "已婚" && eventData.Entity.Department.Name == "呼吸科")
-                   {
-                       lock (_object)
-                       {
-                           var dReportDtos = _dReportcache.GetOrAdd(nameof(DReportDto), () =>
-                           {
-                               return new List<DReportDto>();
-                           });
-                           var dReportDto = _objectMapper.Map<MedicalRecords, DReportDto>(eventData.Entity);
-                           dReportDtos.Add(dReportDto);
-                           _dReportcache.Set(nameof(DReportDto), dReportDtos);
-                       }
-                   }
-               });
+            //_ = Task.Factory.StartNew(() =>
+            //   {
+            //       if (eventData.Entity.Age > 10 && eventData.Entity.Age < 40 && eventData.Entity.Marriage.Name == "已婚" && eventData.Entity.Department.Name == "呼吸科")
+            //       {
+            //           lock (_object)
+            //           {
+            //               var dReportDtos = _dReportcache.GetOrAdd(nameof(DReportDto), () =>
+            //               {
+            //                   return new List<DReportDto>();
+            //               });
+            //               var dReportDto = _objectMapper.Map<MedicalRecords, DReportDto>(eventData.Entity);
+            //               dReportDtos.Add(dReportDto);
+            //               _dReportcache.Set(nameof(DReportDto), dReportDtos);
+            //           }
+            //       }
+            //   });
             await Task.CompletedTask;
         }
     }

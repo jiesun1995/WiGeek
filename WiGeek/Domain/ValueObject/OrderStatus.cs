@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WiGeek.Domain.SeedWork;
+using Volo.Abp.Domain.Entities;
 using WiGeek.Infrastructure.Attributes;
 
 namespace WiGeek.Domain.ValueObject
 {
-    /// <summary>
-    /// 医嘱类型
-    /// </summary>
-    public class OrderType : HospitalAggregateRoot
+    public class OrderStatus: AggregateRoot<int>
     {
+        [ColNumber(0)]
+        public virtual string HospitalCode { set; get; }
         /// <summary>
-        /// 医嘱类型名称
+        /// 状态名称
         /// </summary>
         [ColNumber(1)]
         public string Name { get; set; }
