@@ -3,6 +3,7 @@ using EFCore.BulkExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic.FileIO;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace WiGeek.Application
         public ReadFileDataService(IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
         {
             //var path= configuration.GetValue<string>("RootPath");
-            var path = "E:\\work\\WiGeek\\WiGeek样本数据20200729\\标准比赛数据集";
+            var path = "C:\\data\\WiGeek样本数据20200729\\标准比赛数据集";
             var directoryInfo = new DirectoryInfo(path);
             _fileInfos = ReadFileInfos(directoryInfo);
             _wardRepository = wardRepository;
@@ -92,68 +93,81 @@ namespace WiGeek.Application
         }
         private void ReadFileOneLevel()
         {
-            //Parallel.ForEach(_fileInfos, fileInfo =>
-            foreach (var fileInfo in _fileInfos)
+            var wards = new ConcurrentBag<Ward>();
+            var works = new ConcurrentBag<Work>();
+            var marriages = new ConcurrentBag<Marriage>();
+            var departments = new ConcurrentBag<Department>();
+            var orderTypes = new ConcurrentBag<OrderType>();
+            var orderStatuses = new ConcurrentBag<OrderStatus>();
+
+            Parallel.ForEach(_fileInfos, fileInfo =>
+            //foreach (var fileInfo in _fileInfos)
             {
                 if (fileInfo.Name.Contains("病区字典"))
                 {
-                    _wards = readData<Ward>(fileInfo.FullName);
-
-                    //using (var dbContext = _wardRepository.GetDbContext())
-                        dbContext.BulkInsert(_wards.ToList());
+                    readData<Ward>(ref wards, fileInfo.FullName);
+                    //dbContext.BulkInsert(_wards.ToList());
                 }
                 else if (fileInfo.Name.Contains("工作字典"))
                 {
-                    _works = readData<Work>(fileInfo.FullName);
+                    readData<Work>(ref works, fileInfo.FullName);
                     //using (var dbContext = _workRepository.GetDbContext())
-                        dbContext.BulkInsert(_works.ToList());
+                    //dbContext.BulkInsert(_works.ToList());
                 }
                 else if (fileInfo.Name.Contains("婚姻字典"))
                 {
-                    _marriages = readData<Marriage>(fileInfo.FullName);
+                    readData<Marriage>(ref marriages, fileInfo.FullName);
                     //using (var dbContext = _marriageRepository.GetDbContext())
-                        dbContext.BulkInsert(_marriages.ToList());
+                    //dbContext.BulkInsert(_marriages.ToList());
                 }
                 else if (fileInfo.Name.Contains("科室字典"))
                 {
-                    _departments = readData<Department>(fileInfo.FullName);
+                    readData<Department>(ref departments, fileInfo.FullName);
                     //using (var dbContext = _departmentRepository.GetDbContext())
-                        dbContext.BulkInsert(_departments.ToList());
+                    //dbContext.BulkInsert(_departments.ToList());
                 }
                 else if (fileInfo.Name.Contains("医嘱项目类型字典"))
                 {
-                    _orderTypes = readData<OrderType>(fileInfo.FullName);
+                    readData<OrderType>(ref orderTypes, fileInfo.FullName);
                     //using (var dbContext = _orderTypeRepository.GetDbContext())
-                        dbContext.BulkInsert(_orderTypes.ToList());
+                    //dbContext.BulkInsert(_orderTypes.ToList());
                 }
                 else if (fileInfo.Name.Contains("医嘱状态字典"))
                 {
-                    _orderStatuses = readData<OrderStatus>(fileInfo.FullName);
+                    readData<OrderStatus>(ref orderStatuses, fileInfo.FullName);
                     //using (var dbContext = _orderStatusRepository.GetDbContext())
-                        dbContext.BulkInsert(_orderStatuses.ToList());
+                    //dbContext.BulkInsert(_orderStatuses.ToList());
                 }
-            };
+            });
+            dbContext.BulkInsert(wards.ToList());
+            dbContext.BulkInsert(works.ToList());
+            dbContext.BulkInsert(marriages.ToList());
+            dbContext.BulkInsert(departments.ToList());
+            dbContext.BulkInsert(orderTypes.ToList());
+            dbContext.BulkInsert(orderStatuses.ToList());
+
         }
         private void ReadFileTwoLevel()
         {
-            //Parallel.ForEach(, async fileInfo =>
-            //{
-            List<CreateUpdateMedicalRecordsDto> list = new List<CreateUpdateMedicalRecordsDto>();
-            foreach (var fileInfo in _fileInfos)
+            ConcurrentBag<CreateUpdateMedicalRecordsDto> list = new ConcurrentBag<CreateUpdateMedicalRecordsDto>();
+
+            Parallel.ForEach(_fileInfos, fileInfo =>
             {
+            //foreach (var fileInfo in _fileInfos)
+            //{
                 if (fileInfo.Name.Contains("就诊记录"))
                 {
-                    _medicalRecords = readData<CreateUpdateMedicalRecordsDto>(fileInfo.FullName);
-                    _medicalRecordsService.BulkCreatAsync(_medicalRecords.ToList()).Wait();
-                    list.AddRange(_medicalRecords);
+                    readData<CreateUpdateMedicalRecordsDto>(ref list, fileInfo.FullName);
+                    //_medicalRecordsService.BulkCreatAsync(_medicalRecords.ToList()).Wait();
+                    //list.Add(_medicalRecords);
                 }
-            }
-            //_medicalRecordsService.BulkCreatAsync(list).Wait();
-
-            //});
+            //}
+            });
+            _medicalRecordsService.BulkCreat(list.ToList());
         }
         private async Task ReadFileThreeLevel()
         {
+            var list = new ConcurrentBag<CreateUpdatePhysicalSignsDto>();
             //Parallel.ForEach(, fileInfo =>
             foreach (var fileInfo in _fileInfos)
             {
@@ -166,24 +180,23 @@ namespace WiGeek.Application
                 //else
                 if (fileInfo.Name.Contains("体征数据"))
                 {
-                    var dtos = readData<CreateUpdatePhysicalSignsDto>(fileInfo.FullName);
+                    readData<CreateUpdatePhysicalSignsDto>(ref list, fileInfo.FullName);
                     //_physicalSignsRepository.GetDbContext().BulkInsert(_physicalSigns.ToList());
-                    await _physicalSignsService.BulkCreatAsync(dtos.ToList());
+                    await _physicalSignsService.BulkCreatAsync(list.ToList());
                 }
             }
         }
         public void ReadFileWriteData()
         {
-            //ReadFileOneLevel();
+            ReadFileOneLevel();
             ReadFileTwoLevel();
-            //ReadFileThreeLevel().Wait();
+            ReadFileThreeLevel().Wait();
         }
 
         
 
-        public IEnumerable<T> readData<T>(string FilePath) where T: class,new ()
+        public void readData<T>(ref ConcurrentBag<T>  list, string FilePath) where T: class,new ()
         {
-            var list = new List<T>();
             Dictionary<int, PropertyInfo> PropertyInfoCols = new Dictionary<int, PropertyInfo>();
             Type type = typeof(T);
             foreach (var property in type.GetProperties())
@@ -227,14 +240,13 @@ namespace WiGeek.Application
                                 hospitalId.HospitalId = _hoskey[key];
                             }
                         }
-                    }
+                    }                    
                     if (!fisrt)
                         list.Add(obj);
                     //yield return obj;
                     fisrt = false;
                 }
             }
-            return list;
         }
     }
 }

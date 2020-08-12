@@ -11,7 +11,7 @@ using WiGeek.EntityFrameworkCore;
 namespace WiGeek.Migrations
 {
     [DbContext(typeof(WiGeekDbContext))]
-    [Migration("20200809082538_init")]
+    [Migration("20200812150414_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,16 +31,6 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
@@ -68,16 +58,6 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
@@ -110,12 +90,6 @@ namespace WiGeek.Migrations
                     b.Property<DateTime?>("Birthday")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
                     b.Property<string>("ContactPerson")
                         .HasColumnType("nvarchar(max)");
 
@@ -133,10 +107,6 @@ namespace WiGeek.Migrations
 
                     b.Property<DateTime?>("DischargedTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -159,9 +129,6 @@ namespace WiGeek.Migrations
                     b.Property<string>("PatientName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PhysicalSignsId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Sex")
                         .HasColumnType("nvarchar(max)");
 
@@ -179,8 +146,6 @@ namespace WiGeek.Migrations
 
                     b.HasIndex("MarriageId");
 
-                    b.HasIndex("PhysicalSignsId");
-
                     b.HasIndex("WardId");
 
                     b.HasIndex("WorkId");
@@ -195,20 +160,10 @@ namespace WiGeek.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
                     b.Property<string>("DepartmentId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Dosage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GroupId")
@@ -276,17 +231,7 @@ namespace WiGeek.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
                     b.Property<string>("DiagnosisType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
@@ -338,16 +283,6 @@ namespace WiGeek.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -372,18 +307,8 @@ namespace WiGeek.Migrations
                     b.Property<string>("Breathe")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HeartRate")
                         .HasColumnType("nvarchar(max)");
@@ -394,13 +319,15 @@ namespace WiGeek.Migrations
                     b.Property<string>("HospitalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MedicalRecordsId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("MedicalRecordsId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Temperature")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MedicalRecordsId");
 
                     b.ToTable("PhysicalSigns");
                 });
@@ -411,16 +338,6 @@ namespace WiGeek.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -447,16 +364,6 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnName("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ExtraProperties")
-                        .HasColumnName("ExtraProperties")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
@@ -487,10 +394,6 @@ namespace WiGeek.Migrations
                         .WithMany()
                         .HasForeignKey("MarriageId");
 
-                    b.HasOne("WiGeek.Domain.ValueObject.PhysicalSigns", "PhysicalSigns")
-                        .WithMany()
-                        .HasForeignKey("PhysicalSignsId");
-
                     b.HasOne("WiGeek.Domain.WardAggregate.Ward", "Ward")
                         .WithMany()
                         .HasForeignKey("WardId");
@@ -517,6 +420,13 @@ namespace WiGeek.Migrations
                     b.HasOne("WiGeek.Domain.WardAggregate.Ward", "Ward")
                         .WithMany()
                         .HasForeignKey("WardId");
+                });
+
+            modelBuilder.Entity("WiGeek.Domain.ValueObject.PhysicalSigns", b =>
+                {
+                    b.HasOne("WiGeek.Domain.MedicalRecordsAggregate.MedicalRecords", "MedicalRecords")
+                        .WithMany("PhysicalSigns")
+                        .HasForeignKey("MedicalRecordsId");
                 });
 #pragma warning restore 612, 618
         }

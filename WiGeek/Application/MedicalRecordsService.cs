@@ -107,18 +107,18 @@ namespace WiGeek.Application
             };
         }
 
-        public async Task BulkCreatAsync(List<CreateUpdateMedicalRecordsDto> dtos)
+        public void BulkCreat(List<CreateUpdateMedicalRecordsDto> dtos)
         {
             //var records = base.ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dtos[1]);
             //var records = Map(dtos[1]);
 
             ConcurrentBag<MedicalRecords> medicalRecords = new ConcurrentBag<MedicalRecords>();
 
-            var works = await _workRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWorkId).Distinct().Contains(x.HospitalCode)).ToListAsync();
-            var departments = await _departmentRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDepartmentId).Distinct().Contains(x.HospitalCode)).ToListAsync();
-            var marriages = await _marriageRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosMarriageId).Distinct().Contains(x.HospitalCode)).ToListAsync();
-            var wards = await _wardRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWardId).Distinct().Contains(x.HospitalCode)).ToListAsync();
-            var diagnosis = await _diagnosisRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDiagnosisName).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var works = await _workRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWorkId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var departments = await _departmentRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDepartmentId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var marriages = await _marriageRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosMarriageId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var wards = await _wardRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWardId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var diagnosis = await _diagnosisRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDiagnosisName).Distinct().Contains(x.HospitalCode)).ToListAsync();
 
             //Task.WaitAll(works, departments, marriages, wards, diagnosis);
             
@@ -127,21 +127,58 @@ namespace WiGeek.Application
                 //medicalRecord.Work = works.FirstOrDefault(x => x.HospitalCode == medicalRecord.WardId);
                 //var entity = ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dto);
                 var entity = Map(dto);
-                entity.Work = works.FirstOrDefault(x => x.HospitalCode == dto.HosWorkId);
-                entity.WorkId = entity.Work?.Id;
-                entity.Department = departments.FirstOrDefault(x => x.HospitalCode == dto.HosDepartmentId);
-                entity.DepartmentId = entity.Department?.Id;
-                entity.Marriage = marriages.FirstOrDefault(x => x.HospitalCode == dto.HosMarriageId);
-                entity.MarriageId = entity.Marriage?.Id;
-                entity.Ward = wards.FirstOrDefault(x => x.HospitalCode == dto.HosWardId);
-                entity.WardId = entity.Ward?.Id;
-                entity.Diagnosis = diagnosis.FirstOrDefault(x => x.HospitalCode == dto.HosDiagnosisId);
-                entity.DiagnosisId = entity.Diagnosis?.Id;
+                //entity.Work = works.FirstOrDefault(x => x.HospitalCode == dto.HosWorkId);
+                //entity.WorkId = entity.Work?.Id;
+                //entity.Department = departments.FirstOrDefault(x => x.HospitalCode == dto.HosDepartmentId);
+                //entity.DepartmentId = entity.Department?.Id;
+                //entity.Marriage = marriages.FirstOrDefault(x => x.HospitalCode == dto.HosMarriageId);
+                //entity.MarriageId = entity.Marriage?.Id;
+                //entity.Ward = wards.FirstOrDefault(x => x.HospitalCode == dto.HosWardId);
+                //entity.WardId = entity.Ward?.Id;
+                //entity.Diagnosis = diagnosis.FirstOrDefault(x => x.HospitalCode == dto.HosDiagnosisId);
+                //entity.DiagnosisId = entity.Diagnosis?.Id;
                 medicalRecords.Add(entity);
             });
 
-            //await Repository.GetDbContext().BulkInsertAsync(medicalRecords.ToList());
-            await _medicalRecordsDapperRepository.BulkCreatAsync(medicalRecords.ToList());
+            Repository.GetDbContext().BulkInsertAsync(medicalRecords.ToList()).Wait();
+            //await _medicalRecordsDapperRepository.BulkCreatAsync(medicalRecords.ToList());
+        }
+
+        public async Task BulkCreatAsync(List<CreateUpdateMedicalRecordsDto> dtos)
+        {
+            //var records = base.ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dtos[1]);
+            //var records = Map(dtos[1]);
+
+            ConcurrentBag<MedicalRecords> medicalRecords = new ConcurrentBag<MedicalRecords>();
+
+            //var works = await _workRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWorkId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var departments = await _departmentRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDepartmentId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var marriages = await _marriageRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosMarriageId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var wards = await _wardRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosWardId).Distinct().Contains(x.HospitalCode)).ToListAsync();
+            //var diagnosis = await _diagnosisRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDiagnosisName).Distinct().Contains(x.HospitalCode)).ToListAsync();
+
+            //Task.WaitAll(works, departments, marriages, wards, diagnosis);
+
+            Parallel.ForEach(dtos, dto =>
+            {
+                //medicalRecord.Work = works.FirstOrDefault(x => x.HospitalCode == medicalRecord.WardId);
+                //var entity = ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dto);
+                var entity = Map(dto);
+                //entity.Work = works.FirstOrDefault(x => x.HospitalCode == dto.HosWorkId);
+                //entity.WorkId = entity.Work?.Id;
+                //entity.Department = departments.FirstOrDefault(x => x.HospitalCode == dto.HosDepartmentId);
+                //entity.DepartmentId = entity.Department?.Id;
+                //entity.Marriage = marriages.FirstOrDefault(x => x.HospitalCode == dto.HosMarriageId);
+                //entity.MarriageId = entity.Marriage?.Id;
+                //entity.Ward = wards.FirstOrDefault(x => x.HospitalCode == dto.HosWardId);
+                //entity.WardId = entity.Ward?.Id;
+                //entity.Diagnosis = diagnosis.FirstOrDefault(x => x.HospitalCode == dto.HosDiagnosisId);
+                //entity.DiagnosisId = entity.Diagnosis?.Id;
+                medicalRecords.Add(entity);
+            });
+
+            await Repository.GetDbContext().BulkInsertAsync(medicalRecords.ToList());
+            //await _medicalRecordsDapperRepository.BulkCreatAsync(medicalRecords.ToList());
         }
     }
 }

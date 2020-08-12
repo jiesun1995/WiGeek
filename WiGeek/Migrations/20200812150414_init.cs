@@ -13,8 +13,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Code = table.Column<string>(nullable: true),
@@ -32,8 +30,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
@@ -50,8 +46,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Code = table.Column<string>(nullable: true),
@@ -84,8 +78,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
@@ -96,34 +88,11 @@ namespace WiGeek.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PhysicalSigns",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
-                    HospitalCode = table.Column<string>(nullable: true),
-                    HospitalId = table.Column<string>(nullable: true),
-                    MedicalRecordsId = table.Column<string>(nullable: true),
-                    CreateTime = table.Column<DateTime>(nullable: true),
-                    Breathe = table.Column<string>(nullable: true),
-                    HeartRate = table.Column<string>(nullable: true),
-                    Temperature = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PhysicalSigns", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Wards",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
@@ -140,8 +109,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Code = table.Column<string>(nullable: true),
@@ -158,8 +125,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     WorkId = table.Column<int>(nullable: true),
@@ -178,8 +143,7 @@ namespace WiGeek.Migrations
                     WardId = table.Column<int>(nullable: true),
                     ContactPerson = table.Column<string>(nullable: true),
                     ContactPhone = table.Column<string>(nullable: true),
-                    Add = table.Column<string>(nullable: true),
-                    PhysicalSignsId = table.Column<int>(nullable: true)
+                    Add = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,12 +167,6 @@ namespace WiGeek.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MedicalRecords_PhysicalSigns_PhysicalSignsId",
-                        column: x => x.PhysicalSignsId,
-                        principalTable: "PhysicalSigns",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_MedicalRecords_Wards_WardId",
                         column: x => x.WardId,
                         principalTable: "Wards",
@@ -228,8 +186,6 @@ namespace WiGeek.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ExtraProperties = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(maxLength: 40, nullable: true),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     MedicalRecordsId = table.Column<string>(nullable: true),
@@ -277,6 +233,31 @@ namespace WiGeek.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PhysicalSigns",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HospitalCode = table.Column<string>(nullable: true),
+                    HospitalId = table.Column<string>(nullable: true),
+                    MedicalRecordsId = table.Column<int>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: true),
+                    Breathe = table.Column<string>(nullable: true),
+                    HeartRate = table.Column<string>(nullable: true),
+                    Temperature = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhysicalSigns", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PhysicalSigns_MedicalRecords_MedicalRecordsId",
+                        column: x => x.MedicalRecordsId,
+                        principalTable: "MedicalRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_MedicalRecords_DepartmentId",
                 table: "MedicalRecords",
@@ -291,11 +272,6 @@ namespace WiGeek.Migrations
                 name: "IX_MedicalRecords_MarriageId",
                 table: "MedicalRecords",
                 column: "MarriageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicalRecords_PhysicalSignsId",
-                table: "MedicalRecords",
-                column: "PhysicalSignsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MedicalRecords_WardId",
@@ -326,6 +302,11 @@ namespace WiGeek.Migrations
                 name: "IX_Orders_WardId",
                 table: "Orders",
                 column: "WardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhysicalSigns_MedicalRecordsId",
+                table: "PhysicalSigns",
+                column: "MedicalRecordsId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -334,13 +315,16 @@ namespace WiGeek.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "MedicalRecords");
+                name: "PhysicalSigns");
 
             migrationBuilder.DropTable(
                 name: "OrderStatuses");
 
             migrationBuilder.DropTable(
                 name: "OrderTypes");
+
+            migrationBuilder.DropTable(
+                name: "MedicalRecords");
 
             migrationBuilder.DropTable(
                 name: "Departments");
@@ -350,9 +334,6 @@ namespace WiGeek.Migrations
 
             migrationBuilder.DropTable(
                 name: "Marriages");
-
-            migrationBuilder.DropTable(
-                name: "PhysicalSigns");
 
             migrationBuilder.DropTable(
                 name: "Wards");

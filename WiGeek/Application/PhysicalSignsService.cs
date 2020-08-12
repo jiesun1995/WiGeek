@@ -36,7 +36,7 @@ namespace WiGeek.Application
                 Temperature=dto.Temperature,
                 Breathe=dto.Breathe,
                 HeartRate=dto.HeartRate,
-                MedicalRecordsId=dto.MedicalRecordsId,
+                //MedicalRecordsId=dto.MedicalRecordsId,
             };
         }
 
@@ -44,7 +44,7 @@ namespace WiGeek.Application
         {
             ConcurrentBag<PhysicalSigns> physicalSigns = new ConcurrentBag<PhysicalSigns>();
 
-            var list = dtos.Select(y => y.MedicalRecordsId).Distinct();
+            //var list = dtos.Select(y => y.HosMedicalRecordsId).Distinct();
             //var medicalRecords = await _medicalRecordsRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(y => y.MedicalRecordsId).Distinct().Contains(x.HospitalCode)).ToListAsync();           
 
             Parallel.ForEach(dtos, dto =>
@@ -56,8 +56,8 @@ namespace WiGeek.Application
 
                 physicalSigns.Add(entity);
             });
-            await _physicalSignsDapperRepository.BulkCreatAsync(physicalSigns.ToList());
-            //await Repository.GetDbContext().BulkInsertAsync(physicalSigns);
+            //await _physicalSignsDapperRepository.BulkCreatAsync(physicalSigns.ToList());
+            await Repository.GetDbContext().BulkInsertAsync(physicalSigns.ToList());
         }
     }
 }

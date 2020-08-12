@@ -12,5 +12,6 @@ namespace WiGeek.Application
     public interface IMedicalRecordsService: ICrudAppService<MedicalRecordsDto, int, PagedAndSortedResultRequestDto, CreateUpdateMedicalRecordsDto, CreateUpdateMedicalRecordsDto>
     {
         Task BulkCreatAsync(List<CreateUpdateMedicalRecordsDto> dtos);
+        void BulkCreat(List<CreateUpdateMedicalRecordsDto> dtos);
     }
 }

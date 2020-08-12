@@ -10,7 +10,7 @@ using WiGeek.Startup;
 
 namespace WiGeek.Domain.SeedWork
 {
-    public abstract class HospitalAggregateRoot : AggregateRoot<int>, IHospitalId
+    public abstract class HospitalAggregateRoot : Entity<int>, IHospitalId
     { 
         [ColNumber(0)]
         public virtual string HospitalCode { set; get; }

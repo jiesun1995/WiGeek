@@ -10,7 +10,7 @@ namespace WiGeek.Application.Contracts
     {
         public override string HospitalCode { get; set; }
         [ColNumber(0)]
-        public string MedicalRecordsId { get; set; }
+        public string HosMedicalRecordsId { get; set; }
         [ColNumber(1)]
         public DateTime? CreateTime { get; set; }
         [ColNumber(2)]

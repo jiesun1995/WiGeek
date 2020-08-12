@@ -1,5 +1,4 @@
-﻿using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop.Infrastructure;
 using System;
 using System.Collections.Concurrent;

@@ -14,7 +14,7 @@ namespace WiGeek.Domain.ValueObject
     [Table("PhysicalSigns")]
     public class PhysicalSigns : HospitalAggregateRoot
     {
-        public string MedicalRecordsId { get; set; }
+        public int? MedicalRecordsId { get; set; }
         public DateTime? CreateTime { get; set; }
         public string Breathe { set; get; }
         public string HeartRate { set; get; }
