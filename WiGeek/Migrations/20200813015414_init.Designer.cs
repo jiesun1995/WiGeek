@@ -11,7 +11,7 @@ using WiGeek.EntityFrameworkCore;
 namespace WiGeek.Migrations
 {
     [DbContext(typeof(WiGeekDbContext))]
-    [Migration("20200812150414_init")]
+    [Migration("20200813015414_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,8 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -40,10 +41,12 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InputCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -58,7 +61,8 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -67,7 +71,8 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -82,7 +87,8 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Add")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<DateTime?>("AdmissionTime")
                         .HasColumnType("datetime2");
@@ -91,10 +97,12 @@ namespace WiGeek.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ContactPerson")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<string>("ContactPhone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
@@ -103,7 +111,8 @@ namespace WiGeek.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("DiagnosisName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<DateTime?>("DischargedTime")
                         .HasColumnType("datetime2");
@@ -115,22 +124,27 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalNo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("InputCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<int?>("MarriageId")
                         .HasColumnType("int");
 
                     b.Property<string>("PatientIdCardNo")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(18)")
+                        .HasMaxLength(18);
 
                     b.Property<string>("PatientName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<string>("Sex")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(10)")
+                        .HasMaxLength(10);
 
                     b.Property<int?>("WardId")
                         .HasColumnType("int");
@@ -139,16 +153,6 @@ namespace WiGeek.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("DiagnosisId");
-
-                    b.HasIndex("MarriageId");
-
-                    b.HasIndex("WardId");
-
-                    b.HasIndex("WorkId");
 
                     b.ToTable("MedicalRecords");
                 });
@@ -160,14 +164,16 @@ namespace WiGeek.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("DepartmentId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Dosage")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("GroupId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -175,14 +181,13 @@ namespace WiGeek.Migrations
                     b.Property<string>("HospitalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MedicalRecordsId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MedicalRecordsId1")
-                        .HasColumnType("int");
+                    b.Property<int?>("MedicalRecordsId")
+                        .HasColumnType("int")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<DateTime?>("NurseExecuteTime")
                         .HasColumnType("datetime2");
@@ -200,26 +205,21 @@ namespace WiGeek.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Remark")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Unit")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<int?>("WardId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MedicalRecordsId1");
-
-                    b.HasIndex("OrderStatusId");
-
-                    b.HasIndex("OrderTypeId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("Orders");
                 });
@@ -232,7 +232,8 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("DiagnosisType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -241,7 +242,8 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -266,10 +268,12 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HospitalCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -290,7 +294,8 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -311,7 +316,8 @@ namespace WiGeek.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HeartRate")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -323,11 +329,10 @@ namespace WiGeek.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Temperature")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MedicalRecordsId");
 
                     b.ToTable("PhysicalSigns");
                 });
@@ -346,10 +351,12 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InputCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
@@ -364,7 +371,8 @@ namespace WiGeek.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("HospitalCode")
                         .HasColumnType("nvarchar(max)");
@@ -373,60 +381,12 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Id");
 
                     b.ToTable("Works");
-                });
-
-            modelBuilder.Entity("WiGeek.Domain.MedicalRecordsAggregate.MedicalRecords", b =>
-                {
-                    b.HasOne("WiGeek.Domain.DepartmentAggregate.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId");
-
-                    b.HasOne("WiGeek.Domain.ValueObject.Diagnosis", "Diagnosis")
-                        .WithMany()
-                        .HasForeignKey("DiagnosisId");
-
-                    b.HasOne("WiGeek.Domain.MarriageAggregate.Marriage", "Marriage")
-                        .WithMany()
-                        .HasForeignKey("MarriageId");
-
-                    b.HasOne("WiGeek.Domain.WardAggregate.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId");
-
-                    b.HasOne("WiGeek.Domain.WorkAggregate.Work", "Work")
-                        .WithMany()
-                        .HasForeignKey("WorkId");
-                });
-
-            modelBuilder.Entity("WiGeek.Domain.OrderAggregate.Order", b =>
-                {
-                    b.HasOne("WiGeek.Domain.MedicalRecordsAggregate.MedicalRecords", "MedicalRecords")
-                        .WithMany("Orders")
-                        .HasForeignKey("MedicalRecordsId1");
-
-                    b.HasOne("WiGeek.Domain.ValueObject.OrderStatus", "OrderStatus")
-                        .WithMany()
-                        .HasForeignKey("OrderStatusId");
-
-                    b.HasOne("WiGeek.Domain.ValueObject.OrderType", "OrderType")
-                        .WithMany()
-                        .HasForeignKey("OrderTypeId");
-
-                    b.HasOne("WiGeek.Domain.WardAggregate.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId");
-                });
-
-            modelBuilder.Entity("WiGeek.Domain.ValueObject.PhysicalSigns", b =>
-                {
-                    b.HasOne("WiGeek.Domain.MedicalRecordsAggregate.MedicalRecords", "MedicalRecords")
-                        .WithMany("PhysicalSigns")
-                        .HasForeignKey("MedicalRecordsId");
                 });
 #pragma warning restore 612, 618
         }

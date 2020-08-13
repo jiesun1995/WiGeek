@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
@@ -26,11 +27,13 @@ namespace WiGeek.Domain.WardAggregate
         /// 病区名称
         /// </summary>
         [ColNumber(1)]
+        [MaxLength(500)]
         public string Name { get; set; }
         /// <summary>
         /// 过滤码
         /// </summary>
         [ColNumber(2)]
+        [MaxLength(50)]
         public string InputCode { get; set; }
     }
 }

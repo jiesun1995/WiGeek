@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using WiGeek.Domain.MedicalRecordsAggregate;
@@ -17,18 +19,21 @@ namespace WiGeek.Domain.OrderAggregate
         /// <summary>
         /// 就诊唯一ID
         /// </summary>
-        public string MedicalRecordsId { get; set; }
+        [MaxLength(50)]
+        public int? MedicalRecordsId { get; set; }
         /// <summary>
         /// 同组标识
         /// </summary>
+        [MaxLength(50)]
         public string GroupId { get; set; }
         /// <summary>
         /// 科室ID
         /// </summary>
-        public string DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>
+        [MaxLength(50)]
         public string Type { set; get; }
         /// <summary>
         /// 医嘱类型
@@ -53,26 +58,34 @@ namespace WiGeek.Domain.OrderAggregate
         /// <summary>
         /// 用量
         /// </summary>
+        [MaxLength(50)]
         public string Dosage { get; set; }
         /// <summary>
         /// 用量单位
         /// </summary>
+        [MaxLength(500)]
         public string Unit { set; get; }
         /// <summary>
         /// 医嘱名称
         /// </summary>
+        [MaxLength(500)]
         public string Name { set; get; }
         /// <summary>
         /// 医嘱备注
         /// </summary>
+        [MaxLength(500)]
         public string Remark { get; set; }
         /// <summary>
         /// 执行病区
-        /// </summary>
+        /// </summary>        
         public int? WardId { set; get; }
+        [NotMapped]
         public Ward Ward { get; set; }
+        [NotMapped]
         public OrderType OrderType { set; get; }
+        [NotMapped]
         public MedicalRecords MedicalRecords { get; set; }
+        [NotMapped]
         public OrderStatus OrderStatus { set; get; }
     }
     

@@ -1,6 +1,8 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Events;
@@ -17,7 +19,7 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
     /// <summary>
     /// 就诊记录
     /// </summary>
-    [Table("MedicalRecords")]
+    [Dapper.Contrib.Extensions.Table("MedicalRecords")]
     public class MedicalRecords : HospitalAggregateRoot
     {
 
@@ -82,18 +84,22 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 住院号
         /// </summary>
+        [MaxLength(50)]
         public string HospitalNo { get; set; }
         /// <summary>
         /// 姓名
         /// </summary>
+        [MaxLength(500)]
         public string PatientName { set; get; }
         /// <summary>
         /// 过滤码
         /// </summary>
+        [MaxLength(50)]
         public string InputCode { get; set; }
         /// <summary>
         /// 性别
         /// </summary>
+        [MaxLength(10)]
         public string Sex { get; set; }
         /// <summary>
         /// 出生日期
@@ -102,10 +108,12 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 身份证号
         /// </summary>
+        [MaxLength(18)]
         public string PatientIdCardNo { get; set; }
         /// <summary>
         /// 主要诊断
         /// </summary>
+        [MaxLength(500)]
         public string DiagnosisName { get; set; }
         /// <summary>
         /// 诊断Id
@@ -113,7 +121,7 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         public int? DiagnosisId { get; set; }
         /// <summary>
         /// 出院日期
-        /// </summary>
+        /// </summary>        
         public DateTime? DischargedTime { get; set; }
         /// <summary>
         /// 病区ID
@@ -122,30 +130,41 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 联系人
         /// </summary>
+        [MaxLength(500)]
         public string ContactPerson { get; set; }
         /// <summary>
         /// 联系人电话
         /// </summary>
+        [MaxLength(100)]
         public string ContactPhone { get; set; }
         /// <summary>
         /// 家庭住址
         /// </summary>
+        [MaxLength(500)]
         public string Add { get; set; }
         [Computed]
+        [NotMapped]
         public int? Age { get { return DateTime.Now.Year - Birthday?.Year; } }
         [Computed]
+        [NotMapped]
         public Department Department { get; set; }
         [Computed]
+        [NotMapped]
         public Marriage Marriage { get; set; }
         [Computed]
+        [NotMapped]
         public List<Order> Orders { get; set; } = new List<Order>();
         [Computed]
+        [NotMapped]
         public Diagnosis Diagnosis { get; set; }
         [Computed]
+        [NotMapped]
         public Ward Ward { get; set; }
         [Computed]
+        [NotMapped]
         public Work Work { get; set; }
         [Computed]
+        [NotMapped]
         public List<PhysicalSigns> PhysicalSigns { get; set; }
     }
 }

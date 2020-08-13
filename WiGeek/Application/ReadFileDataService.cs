@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Internal;
 using EFCore.BulkExtensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Concurrent;
@@ -54,8 +55,9 @@ namespace WiGeek.Application
         private readonly IRepository<MedicalRecords, int> _medicalRecordsRepository;
         private readonly WiGeekDbContext dbContext;
         private readonly Dictionary<string, string> _hoskey;
+        private readonly IServiceProvider _serviceProvider;
 
-        public ReadFileDataService(IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
+        public ReadFileDataService(IServiceProvider serviceProvider, IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
         {
             //var path= configuration.GetValue<string>("RootPath");
             var path = "C:\\data\\WiGeek样本数据20200729\\标准比赛数据集";
@@ -74,6 +76,7 @@ namespace WiGeek.Application
             dbContext = _dbContext;
             _orderService = orderService;
             _physicalSignsService = physicalSignsService;
+            _serviceProvider = serviceProvider;
             _hoskey = new Dictionary<string, string>
             {
                 {"医院数据1","0" },
@@ -165,31 +168,64 @@ namespace WiGeek.Application
             });
             _medicalRecordsService.BulkCreat(list.ToList());
         }
+        private async Task BulkCreatAsync<T>(ConcurrentBag<T> list,Func<IEnumerable<T>,Task> creat)
+        {
+            //var length= list.Count / 100000;
+            var count = 1000000;
+            for (int i = 0; i < list.Count; i=i+ count)
+            {
+                var data = list.Skip(i).Take(count);
+                await creat(data);
+            }
+        }
         private async Task ReadFileThreeLevel()
         {
             var list = new ConcurrentBag<CreateUpdatePhysicalSignsDto>();
-            //Parallel.ForEach(, fileInfo =>
-            foreach (var fileInfo in _fileInfos)
+            var createUpdateOrders = new ConcurrentBag<CreateUpdateOrderDto>();
+            Parallel.ForEach(_fileInfos, fileInfo =>
+            //foreach (var fileInfo in _fileInfos)
             {
-                //if (fileInfo.Name.Contains("医嘱数据"))
-                //{
-                //    var _orders = readData<CreateUpdateOrderDto>(fileInfo.FullName);
-                //    //_orderRepository.GetDbContext().BulkInsert(_orders.ToList());
-                //    await _orderService.BulkCreatAsync(_orders.ToList());
-                //}
-                //else
-                if (fileInfo.Name.Contains("体征数据"))
+
+                //var physicalSignsService = _serviceProvider.GetRequiredService<IPhysicalSignsService>();
+                if (fileInfo.Name.Contains("医嘱数据"))
                 {
-                    readData<CreateUpdatePhysicalSignsDto>(ref list, fileInfo.FullName);
-                    //_physicalSignsRepository.GetDbContext().BulkInsert(_physicalSigns.ToList());
-                    await _physicalSignsService.BulkCreatAsync(list.ToList());
+                    //await readAndWrite<CreateUpdateOrderDto>(fileInfo.FullName, async data =>
+                    // {
+                    //     await _orderService.BulkCreatAsync(data.ToList());
+                    // });
+                    readData<CreateUpdateOrderDto>(ref createUpdateOrders, fileInfo.FullName);
+                    //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
                 }
-            }
+                //else
+                //if (fileInfo.Name.Contains("体征数据"))
+                //{
+                //    //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
+                //    // {
+                //    //     await _physicalSignsService.BulkCreatAsync(data.ToList());
+                //    // },500000);
+                //    readData<CreateUpdatePhysicalSignsDto>(ref list, fileInfo.FullName);
+                //    //await _physicalSignsService.BulkCreatAsync(list.ToList());
+                //}
+                //}
+            });
+
+            await BulkCreatAsync(createUpdateOrders, async data =>
+             {
+                 await _orderService.BulkCreatAsync(data.ToList());
+             });
+            //await BulkCreatAsync(list, async data =>
+            // {
+            //     await _physicalSignsService.BulkCreatAsync(data.ToList());
+            // });
+            //list.Clear();
+            createUpdateOrders.Clear();
+            //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
+            //await _physicalSignsService.BulkCreatAsync(list.ToList());
         }
         public void ReadFileWriteData()
         {
-            ReadFileOneLevel();
-            ReadFileTwoLevel();
+            //ReadFileOneLevel();
+            //ReadFileTwoLevel();
             ReadFileThreeLevel().Wait();
         }
 
@@ -248,5 +284,73 @@ namespace WiGeek.Application
                 }
             }
         }
+
+        public async Task readAndWrite<T>(string FilePath,Func<IList<T>,Task> write, int length=100000) where T:class,new()
+        {
+            List<T> list = new List<T>(length);
+            Dictionary<int, PropertyInfo> PropertyInfoCols = new Dictionary<int, PropertyInfo>();
+            Type type = typeof(T);
+            foreach (var property in type.GetProperties())
+            {
+                var colNumberAttribute = property.GetAttribute<ColNumberAttribute>();
+                if (colNumberAttribute != null)
+                {
+                    PropertyInfoCols.Add(colNumberAttribute.ColNumber, property);
+                }
+            }
+            bool fisrt = true;
+            using (TextFieldParser parser = new TextFieldParser(FilePath, Encoding.GetEncoding("GB2312")))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    T obj = new T();
+                    string[] fields = parser.ReadFields();
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        if (fisrt)
+                            continue;
+                        var field = fields[i];
+                        if (PropertyInfoCols.ContainsKey(i))
+                        {
+                            if (PropertyInfoCols[i].PropertyType == typeof(DateTime?))
+                                if (DateTime.TryParse(field, out DateTime dt))
+                                    PropertyInfoCols[i].SetValue(obj, dt);
+                                else
+                                    PropertyInfoCols[i].SetValue(obj, null);
+                            else
+                                PropertyInfoCols[i].SetValue(obj, field);
+                        }
+                        if (obj is IHospitalId)
+                        {
+                            var hospitalId = obj as IHospitalId;
+                            var key = _hoskey.Keys.FirstOrDefault(x => FilePath.Contains(x));
+                            if (_hoskey.Keys.Any(x => FilePath.Contains(x)))
+                            {
+                                hospitalId.HospitalId = _hoskey[key];
+                            }
+                        }
+                    }
+                    if (!fisrt)
+                    {
+                        list.Add(obj);
+                        if (list.Count >= length)
+                        {
+                            await write(list);
+                            list.Clear();
+                        }
+                    }
+                    //yield return obj;
+                    fisrt = false;
+                }
+                if (list.Count > 0)
+                {
+                    await write(list);
+                    list.Clear();
+                }
+            }            
+        }
+
     }
 }
