@@ -2,6 +2,8 @@
 using EFCore.BulkExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Concurrent;
@@ -56,11 +58,16 @@ namespace WiGeek.Application
         private readonly WiGeekDbContext dbContext;
         private readonly Dictionary<string, string> _hoskey;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ReadFileDataService> _logger;
 
-        public ReadFileDataService(IServiceProvider serviceProvider, IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
+        public ReadFileDataService(ILogger<ReadFileDataService> logger, IHostEnvironment hostEnvironment, IServiceProvider serviceProvider, IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
         {
+            var path = string.Empty;
             //var path= configuration.GetValue<string>("RootPath");
-            var path = "C:\\data\\WiGeek样本数据20200729\\标准比赛数据集";
+            if (hostEnvironment.IsDevelopment())
+                path = "C:\\data\\WiGeek样本数据20200729\\标准比赛数据集";
+            else
+                path = "D:\\wndata";
             var directoryInfo = new DirectoryInfo(path);
             _fileInfos = ReadFileInfos(directoryInfo);
             _wardRepository = wardRepository;
@@ -77,6 +84,7 @@ namespace WiGeek.Application
             _orderService = orderService;
             _physicalSignsService = physicalSignsService;
             _serviceProvider = serviceProvider;
+            _logger = logger;
             _hoskey = new Dictionary<string, string>
             {
                 {"医院数据1","0" },
@@ -141,6 +149,8 @@ namespace WiGeek.Application
                     //using (var dbContext = _orderStatusRepository.GetDbContext())
                     //dbContext.BulkInsert(_orderStatuses.ToList());
                 }
+
+
             });
             dbContext.BulkInsert(wards.ToList());
             dbContext.BulkInsert(works.ToList());
@@ -170,7 +180,6 @@ namespace WiGeek.Application
         }
         private async Task BulkCreatAsync<T>(ConcurrentBag<T> list,Func<IEnumerable<T>,Task> creat)
         {
-            //var length= list.Count / 100000;
             var count = 1000000;
             for (int i = 0; i < list.Count; i=i+ count)
             {
@@ -196,40 +205,151 @@ namespace WiGeek.Application
                     readData<CreateUpdateOrderDto>(ref createUpdateOrders, fileInfo.FullName);
                     //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
                 }
-                //else
-                //if (fileInfo.Name.Contains("体征数据"))
-                //{
-                //    //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
-                //    // {
-                //    //     await _physicalSignsService.BulkCreatAsync(data.ToList());
-                //    // },500000);
-                //    readData<CreateUpdatePhysicalSignsDto>(ref list, fileInfo.FullName);
-                //    //await _physicalSignsService.BulkCreatAsync(list.ToList());
-                //}
-                //}
+                else
+                if (fileInfo.Name.Contains("体征数据"))
+                {
+                    //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
+                    // {
+                    //     await _physicalSignsService.BulkCreatAsync(data.ToList());
+                    // },500000);
+                    readData<CreateUpdatePhysicalSignsDto>(ref list, fileInfo.FullName);
+                    //await _physicalSignsService.BulkCreatAsync(list.ToList());
+                }
+            //}
             });
 
             await BulkCreatAsync(createUpdateOrders, async data =>
              {
                  await _orderService.BulkCreatAsync(data.ToList());
              });
-            //await BulkCreatAsync(list, async data =>
-            // {
-            //     await _physicalSignsService.BulkCreatAsync(data.ToList());
-            // });
-            //list.Clear();
+            await BulkCreatAsync(list, async data =>
+             {
+                 await _physicalSignsService.BulkCreatAsync(data.ToList());
+             });
+            list.Clear();
             createUpdateOrders.Clear();
             //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
             //await _physicalSignsService.BulkCreatAsync(list.ToList());
         }
+        private async Task ReadFile()
+        {
+            var wards = new ConcurrentBag<Ward>();
+            var works = new ConcurrentBag<Work>();
+            var marriages = new ConcurrentBag<Marriage>();
+            var departments = new ConcurrentBag<Department>();
+            var orderTypes = new ConcurrentBag<OrderType>();
+            var orderStatuses = new ConcurrentBag<OrderStatus>();
+            var createUpdateMedicalRecords = new ConcurrentBag<CreateUpdateMedicalRecordsDto>();
+            var createUpdatePhysicalSigns = new ConcurrentBag<CreateUpdatePhysicalSignsDto>();
+            var createUpdateOrders = new ConcurrentBag<CreateUpdateOrderDto>();
+
+            Parallel.ForEach(_fileInfos, fileInfo =>
+            //foreach (var fileInfo in _fileInfos)
+            {
+                if (fileInfo.Name.Contains("病区字典"))
+                {
+                    readData<Ward>(ref wards, fileInfo.FullName);
+                    //dbContext.BulkInsert(_wards.ToList());
+                }
+                else if (fileInfo.Name.Contains("工作字典"))
+                {
+                    readData<Work>(ref works, fileInfo.FullName);
+                    //using (var dbContext = _workRepository.GetDbContext())
+                    //dbContext.BulkInsert(_works.ToList());
+                }
+                else if (fileInfo.Name.Contains("婚姻字典"))
+                {
+                    readData<Marriage>(ref marriages, fileInfo.FullName);
+                    //using (var dbContext = _marriageRepository.GetDbContext())
+                    //dbContext.BulkInsert(_marriages.ToList());
+                }
+                else if (fileInfo.Name.Contains("科室字典"))
+                {
+                    readData<Department>(ref departments, fileInfo.FullName);
+                    //using (var dbContext = _departmentRepository.GetDbContext())
+                    //dbContext.BulkInsert(_departments.ToList());
+                }
+                else if (fileInfo.Name.Contains("医嘱项目类型字典"))
+                {
+                    readData<OrderType>(ref orderTypes, fileInfo.FullName);
+                    //using (var dbContext = _orderTypeRepository.GetDbContext())
+                    //dbContext.BulkInsert(_orderTypes.ToList());
+                }
+                else if (fileInfo.Name.Contains("医嘱状态字典"))
+                {
+                    readData<OrderStatus>(ref orderStatuses, fileInfo.FullName);
+                    //using (var dbContext = _orderStatusRepository.GetDbContext())
+                    //dbContext.BulkInsert(_orderStatuses.ToList());
+                }
+                else if (fileInfo.Name.Contains("就诊记录"))
+                {
+                    readData<CreateUpdateMedicalRecordsDto>(ref createUpdateMedicalRecords, fileInfo.FullName);
+                    //_medicalRecordsService.BulkCreatAsync(_medicalRecords.ToList()).Wait();
+                    //list.Add(_medicalRecords);
+                }
+                else if (fileInfo.Name.Contains("医嘱数据"))
+                {
+                    //await readAndWrite<CreateUpdateOrderDto>(fileInfo.FullName, async data =>
+                    // {
+                    //     await _orderService.BulkCreatAsync(data.ToList());
+                    // });
+                    readData<CreateUpdateOrderDto>(ref createUpdateOrders, fileInfo.FullName);
+                    //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
+                }
+                else
+               if (fileInfo.Name.Contains("体征数据"))
+                {
+                    //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
+                    // {
+                    //     await _physicalSignsService.BulkCreatAsync(data.ToList());
+                    // },500000);
+                    readData<CreateUpdatePhysicalSignsDto>(ref createUpdatePhysicalSigns, fileInfo.FullName);
+                    //await _physicalSignsService.BulkCreatAsync(list.ToList());
+                }
+
+
+            });
+            dbContext.BulkInsert(wards.ToList());
+            dbContext.BulkInsert(works.ToList());
+            dbContext.BulkInsert(marriages.ToList());
+            dbContext.BulkInsert(departments.ToList());
+            dbContext.BulkInsert(orderTypes.ToList());
+            dbContext.BulkInsert(orderStatuses.ToList());
+            _medicalRecordsService.BulkCreat(createUpdateMedicalRecords.ToList());
+            await BulkCreatAsync(createUpdateOrders, async data =>
+            {
+                await _orderService.BulkCreatAsync(data.ToList());
+            });
+            await BulkCreatAsync(createUpdatePhysicalSigns, async data =>
+            {
+                await _physicalSignsService.BulkCreatAsync(data.ToList());
+            });
+            wards.Clear();
+            works.Clear();
+            marriages.Clear();
+            departments.Clear();
+            orderTypes.Clear();
+            orderStatuses.Clear();
+            createUpdateMedicalRecords.Clear();
+            createUpdatePhysicalSigns.Clear();
+            createUpdateOrders.Clear();
+        }
         public void ReadFileWriteData()
         {
-            //ReadFileOneLevel();
-            //ReadFileTwoLevel();
+            _logger.LogInformation("开始数据导入");
+            ReadFile().Wait();
+            _logger.LogInformation("数据导入完成");
+        }
+        public void ReadFileWriteDataByLevel()
+        {
+            _logger.LogInformation("开始数据导入");
+            ReadFileOneLevel();
+            ReadFileTwoLevel();
             ReadFileThreeLevel().Wait();
+            _logger.LogInformation("数据导入完成");
         }
 
-        
+
 
         public void readData<T>(ref ConcurrentBag<T>  list, string FilePath) where T: class,new ()
         {
