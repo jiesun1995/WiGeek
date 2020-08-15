@@ -24,7 +24,7 @@ namespace WiGeek.Application.Contracts
         /// 科室ID
         /// </summary>
         [ColNumber(3)]
-        public string DepartmentId { get; set; }
+        public string HosDepartmentId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>
@@ -43,33 +43,39 @@ namespace WiGeek.Application.Contracts
         /// <summary>
         /// 状态
         /// </summary>
-        [ColNumber(7)]
+        
         public string Status { get; set; }
         /// <summary>
         /// 开立时间
         /// </summary>
-        [ColNumber(8)]
+        [ColNumber(7)]
         public DateTime? OpenTime { get; set; }
         /// <summary>
         /// 护士审核时间
         /// </summary>
-        [ColNumber(9)]
+        [ColNumber(8)]
         public DateTime? NurseReviewTime { set; get; }
         /// <summary>
         /// 护士执行时间
         /// </summary>
-        [ColNumber(10)]
+        [ColNumber(9)]
         public DateTime? NurseExecuteTime { set; get; }
         /// <summary>
         /// 用量
         /// </summary>
-        [ColNumber(11)]
+        [ColNumber(10)]
         public string Dosage { get; set; }
+        /// <summary>
         /// <summary>
         /// 用量单位
         /// </summary>
-        [ColNumber(12)]
+        [ColNumber(11)]
         public string Unit { set; get; }
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        [ColNumber(12)]
+        public DateTime? ExecuteTime { get; set; }
         /// <summary>
         /// 医嘱名称
         /// </summary>

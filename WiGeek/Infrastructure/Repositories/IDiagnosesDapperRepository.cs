@@ -6,10 +6,9 @@ using WiGeek.Domain.ValueObject;
 
 namespace WiGeek.Infrastructure.Repositories
 {
-    public interface IPhysicalSignsDapperRepository
+    public interface IDiagnosesDapperRepository
     {
-        Task BulkCreatAsync(IList<PhysicalSigns> physicalSigns);
-        Task<IEnumerable<PhysicalSigns>> GetNotInMedicalRecords();
+        Task<IEnumerable<Diagnosis>> GetNotInMedicalRecords();
         Task<int> DelNotInMedicalRecords();
     }
 }

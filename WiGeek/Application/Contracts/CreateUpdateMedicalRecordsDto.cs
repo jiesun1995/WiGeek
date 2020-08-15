@@ -57,6 +57,7 @@ namespace WiGeek.Application.Contracts
         /// 身份证号
         /// </summary>
         [ColNumber(10)]
+        [IdCard]
         public string PatientIdCardNo { get; set; }
         /// <summary>
         /// 主要诊断

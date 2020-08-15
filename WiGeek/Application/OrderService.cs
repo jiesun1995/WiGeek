@@ -38,21 +38,29 @@ namespace WiGeek.Application
             _orderDapperRepository = orderDapperRepository;
         }
 
-        private Order Map(CreateUpdateOrderDto dto) => new Order
-        {
-            //DepartmentId = dto.DepartmentId,
-            Dosage = dto.Dosage,
-            Name = dto.Name,
-            OpenTime = dto.OpenTime,
-            GroupId = dto.GroupId,
-            NurseReviewTime = dto.NurseReviewTime,
-            NurseExecuteTime=dto.NurseExecuteTime,
-            Unit=dto.Unit,
-            Remark=dto.Remark,
-            HospitalId=dto.HospitalId,
-            HospitalCode=dto.HospitalCode,
-            Type=dto.Type,            
-        };
+        private Order Map(CreateUpdateOrderDto dto) {
+            return new Order
+            {
+                //DepartmentId = dto.DepartmentId,
+                Dosage = dto.Dosage,
+                Name = dto.Name,
+                OpenTime = dto.OpenTime,
+                GroupId = dto.GroupId,
+                NurseReviewTime = dto.NurseReviewTime,
+                NurseExecuteTime = dto.NurseExecuteTime,
+                Unit = dto.Unit,
+                Remark = dto.Remark,
+                HospitalId = dto.HospitalId,
+                HospitalCode = dto.HospitalCode,
+                Type = dto.Type,
+                ExecuteTime = dto.ExecuteTime,
+                WardId = dto.HosWardId,
+                OrderStatusId = dto.HosOrderStatusId,
+                DepartmentId = dto.HosDepartmentId,
+                MedicalRecordsId = dto.HosMedicalRecordsId,
+                OrderTypeId = dto.HosOrderTypeId
+            };
+        }
 
         public async Task BulkCreatAsync(List<CreateUpdateOrderDto> dtos)
         {

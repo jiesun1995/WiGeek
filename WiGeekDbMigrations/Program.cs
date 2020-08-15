@@ -12,6 +12,9 @@ namespace WiGeekDbMigrations
     {
         static async Task Main(string[] args)
         {
+            
+
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .Enrich.FromLogContext()

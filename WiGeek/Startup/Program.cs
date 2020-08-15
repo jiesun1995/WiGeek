@@ -21,6 +21,7 @@ namespace WiGeek.Startup
         public static readonly string AppName = Namespace;
         public static void Main(string[] args)
         {
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Log.Logger = new LoggerConfiguration()
 #if DEBUG
@@ -35,7 +36,8 @@ namespace WiGeek.Startup
     .WriteTo.Console()
     .CreateLogger();
             var host = CreateHostBuilder(args).Build();
-            ReadFileData(host);
+            if (args.Any(x => x.Contains("initdata")))
+                ReadFileData(host);
             host.Run();
         }
 
@@ -48,6 +50,8 @@ namespace WiGeek.Startup
                 .UseAutofac()
             .UseSerilog()
             ;
+
+       
 
         private static void ReadFileData(IHost webHost)
         {

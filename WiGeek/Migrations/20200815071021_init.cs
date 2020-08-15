@@ -33,7 +33,8 @@ namespace WiGeek.Migrations
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 500, nullable: true),
-                    DiagnosisType = table.Column<string>(maxLength: 50, nullable: true)
+                    DiagnosisType = table.Column<string>(maxLength: 50, nullable: true),
+                    IsDel = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,9 +65,9 @@ namespace WiGeek.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
-                    WorkId = table.Column<int>(nullable: true),
-                    MarriageId = table.Column<int>(nullable: true),
-                    DepartmentId = table.Column<int>(nullable: true),
+                    WorkId = table.Column<string>(maxLength: 50, nullable: true),
+                    MarriageId = table.Column<string>(maxLength: 50, nullable: true),
+                    DepartmentId = table.Column<string>(maxLength: 50, nullable: true),
                     AdmissionTime = table.Column<DateTime>(nullable: true),
                     HospitalNo = table.Column<string>(maxLength: 50, nullable: true),
                     PatientName = table.Column<string>(maxLength: 500, nullable: true),
@@ -75,9 +76,9 @@ namespace WiGeek.Migrations
                     Birthday = table.Column<DateTime>(nullable: true),
                     PatientIdCardNo = table.Column<string>(maxLength: 18, nullable: true),
                     DiagnosisName = table.Column<string>(maxLength: 500, nullable: true),
-                    DiagnosisId = table.Column<int>(nullable: true),
+                    DiagnosisId = table.Column<string>(maxLength: 50, nullable: true),
                     DischargedTime = table.Column<DateTime>(nullable: true),
-                    WardId = table.Column<int>(nullable: true),
+                    WardId = table.Column<string>(maxLength: 50, nullable: true),
                     ContactPerson = table.Column<string>(maxLength: 500, nullable: true),
                     ContactPhone = table.Column<string>(maxLength: 100, nullable: true),
                     Add = table.Column<string>(maxLength: 500, nullable: true)
@@ -95,20 +96,22 @@ namespace WiGeek.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
-                    MedicalRecordsId = table.Column<int>(maxLength: 50, nullable: true),
+                    MedicalRecordsId = table.Column<string>(maxLength: 50, nullable: true),
                     GroupId = table.Column<string>(maxLength: 50, nullable: true),
-                    DepartmentId = table.Column<int>(nullable: true),
+                    DepartmentId = table.Column<string>(maxLength: 50, nullable: true),
                     Type = table.Column<string>(maxLength: 50, nullable: true),
-                    OrderTypeId = table.Column<int>(nullable: true),
-                    OrderStatusId = table.Column<int>(nullable: true),
+                    OrderTypeId = table.Column<string>(maxLength: 50, nullable: true),
+                    OrderStatusId = table.Column<string>(maxLength: 50, nullable: true),
                     OpenTime = table.Column<DateTime>(nullable: true),
                     NurseReviewTime = table.Column<DateTime>(nullable: true),
                     NurseExecuteTime = table.Column<DateTime>(nullable: true),
                     Dosage = table.Column<string>(maxLength: 50, nullable: true),
+                    ExecuteTime = table.Column<DateTime>(nullable: true),
                     Unit = table.Column<string>(maxLength: 50, nullable: true),
                     Name = table.Column<string>(maxLength: 500, nullable: true),
                     Remark = table.Column<string>(maxLength: 500, nullable: true),
-                    WardId = table.Column<int>(nullable: true)
+                    IsDel = table.Column<bool>(nullable: false),
+                    WardId = table.Column<string>(maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,11 +157,12 @@ namespace WiGeek.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HospitalCode = table.Column<string>(nullable: true),
                     HospitalId = table.Column<string>(nullable: true),
-                    MedicalRecordsId = table.Column<int>(nullable: true),
+                    MedicalRecordsId = table.Column<string>(maxLength: 50, nullable: true),
                     CreateTime = table.Column<DateTime>(nullable: true),
                     Breathe = table.Column<string>(nullable: true),
                     HeartRate = table.Column<string>(maxLength: 50, nullable: true),
-                    Temperature = table.Column<string>(maxLength: 50, nullable: true)
+                    Temperature = table.Column<string>(maxLength: 50, nullable: true),
+                    IsDel = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

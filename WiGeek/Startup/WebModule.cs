@@ -55,6 +55,16 @@ namespace WiGeek.Startup
             {
                 options.AddMaps<WebModule>();
             });
+
+            context.Services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                    .SetIsOriginAllowed((host) => true)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
         }
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
@@ -72,6 +82,7 @@ namespace WiGeek.Startup
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "WiGeek API");
             });
             app.UseRouting();
+            app.UseCors("CorsPolicy");
             app.UseConfiguredEndpoints();
         }
     }

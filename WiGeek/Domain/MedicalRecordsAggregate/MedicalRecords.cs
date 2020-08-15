@@ -13,6 +13,7 @@ using WiGeek.Domain.SeedWork;
 using WiGeek.Domain.ValueObject;
 using WiGeek.Domain.WardAggregate;
 using WiGeek.Domain.WorkAggregate;
+using WiGeek.Infrastructure.Attributes;
 
 namespace WiGeek.Domain.MedicalRecordsAggregate
 {
@@ -62,21 +63,24 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         //    ContactPerson = contactPerson;
         //    ContactPhone = contactPhone;
         //    Add = add;
-            
+
         //}
 
         /// <summary>
         /// 工作
         /// </summary>
-        public int? WorkId { get; set; }
+        [MaxLength(50)]
+        public string WorkId { get; set; }
         /// <summary>
         /// 婚姻
         /// </summary>
-        public int? MarriageId { set; get; }
+        [MaxLength(50)]
+        public string MarriageId { set; get; }
         /// <summary>
         /// 科室ID
         /// </summary>
-        public int? DepartmentId { get; set; }
+        [MaxLength(50)]
+        public string DepartmentId { get; set; }
         /// <summary>
         /// 入院时间
         /// </summary>
@@ -109,6 +113,7 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// 身份证号
         /// </summary>
         [MaxLength(18)]
+        [IdCard]
         public string PatientIdCardNo { get; set; }
         /// <summary>
         /// 主要诊断
@@ -118,7 +123,8 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 诊断Id
         /// </summary>
-        public int? DiagnosisId { get; set; }
+        [MaxLength(50)]
+        public string DiagnosisId { get; set; }
         /// <summary>
         /// 出院日期
         /// </summary>        
@@ -126,7 +132,8 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 病区ID
         /// </summary>
-        public int? WardId { get; set; }
+        [MaxLength(50)]
+        public string WardId { get; set; }
         /// <summary>
         /// 联系人
         /// </summary>

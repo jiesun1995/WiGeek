@@ -102,11 +102,13 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                    b.Property<string>("DepartmentId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
-                    b.Property<int?>("DiagnosisId")
-                        .HasColumnType("int");
+                    b.Property<string>("DiagnosisId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("DiagnosisName")
                         .HasColumnType("nvarchar(500)")
@@ -129,8 +131,9 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<int?>("MarriageId")
-                        .HasColumnType("int");
+                    b.Property<string>("MarriageId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("PatientIdCardNo")
                         .HasColumnType("nvarchar(18)")
@@ -144,11 +147,13 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasMaxLength(10);
 
-                    b.Property<int?>("WardId")
-                        .HasColumnType("int");
+                    b.Property<string>("WardId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
-                    b.Property<int?>("WorkId")
-                        .HasColumnType("int");
+                    b.Property<string>("WorkId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -162,12 +167,16 @@ namespace WiGeek.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                    b.Property<string>("DepartmentId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Dosage")
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
+
+                    b.Property<DateTime?>("ExecuteTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GroupId")
                         .HasColumnType("nvarchar(50)")
@@ -179,8 +188,11 @@ namespace WiGeek.Migrations
                     b.Property<string>("HospitalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MedicalRecordsId")
-                        .HasColumnType("int")
+                    b.Property<bool>("IsDel")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MedicalRecordsId")
+                        .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
                     b.Property<string>("Name")
@@ -196,11 +208,13 @@ namespace WiGeek.Migrations
                     b.Property<DateTime?>("OpenTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("OrderStatusId")
-                        .HasColumnType("int");
+                    b.Property<string>("OrderStatusId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
-                    b.Property<int?>("OrderTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("OrderTypeId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Remark")
                         .HasColumnType("nvarchar(500)")
@@ -214,8 +228,9 @@ namespace WiGeek.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<int?>("WardId")
-                        .HasColumnType("int");
+                    b.Property<string>("WardId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -238,6 +253,9 @@ namespace WiGeek.Migrations
 
                     b.Property<string>("HospitalId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDel")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(500)")
@@ -323,8 +341,12 @@ namespace WiGeek.Migrations
                     b.Property<string>("HospitalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MedicalRecordsId")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsDel")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MedicalRecordsId")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Temperature")
                         .HasColumnType("nvarchar(50)")

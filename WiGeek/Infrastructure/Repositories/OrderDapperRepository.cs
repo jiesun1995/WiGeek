@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,14 @@ namespace WiGeek.Infrastructure.Repositories
         public async Task BulkCreatAsync(IList<Order> orders)
         {
             await DbConnection.InsertAsync(orders);
+        }
+        public async Task<IEnumerable<Order>> GetNotInMedicalRecords()
+        {
+            return await DbConnection.QueryAsync<Order>("select * from Orders where  MedicalRecordsId not in ( select HospitalCode from MedicalRecords)");
+        }
+        public async Task<int> DelNotInMedicalRecords()
+        {
+            return await DbConnection.ExecuteAsync("update Orders set IsDel = 1 where  MedicalRecordsId not in (select HospitalCode from MedicalRecords)");
         }
     }
 }

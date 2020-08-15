@@ -14,13 +14,13 @@ namespace WiGeek.Domain.OrderAggregate
     /// <summary>
     /// 医嘱
     /// </summary>
-    public class Order : HospitalAggregateRoot
+    public class Order : HospitalAggregateRoot,IIsDel
     {
         /// <summary>
         /// 就诊唯一ID
         /// </summary>
         [MaxLength(50)]
-        public int? MedicalRecordsId { get; set; }
+        public string MedicalRecordsId { get; set; }
         /// <summary>
         /// 同组标识
         /// </summary>
@@ -29,7 +29,8 @@ namespace WiGeek.Domain.OrderAggregate
         /// <summary>
         /// 科室ID
         /// </summary>
-        public int? DepartmentId { get; set; }
+        [MaxLength(50)]
+        public string DepartmentId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>
@@ -38,11 +39,13 @@ namespace WiGeek.Domain.OrderAggregate
         /// <summary>
         /// 医嘱类型
         /// </summary>
-        public int? OrderTypeId { set; get; }
+        [MaxLength(50)]
+        public string OrderTypeId { set; get; }
         /// <summary>
         /// 状态
         /// </summary>
-        public int? OrderStatusId { get; set; }
+        [MaxLength(50)]
+        public string OrderStatusId { get; set; }
         /// <summary>
         /// 开立时间
         /// </summary>
@@ -61,9 +64,13 @@ namespace WiGeek.Domain.OrderAggregate
         [MaxLength(50)]
         public string Dosage { get; set; }
         /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteTime { get; set; }
+        /// <summary>
         /// 用量单位
         /// </summary>
-        [MaxLength(500)]
+        [MaxLength(50)]
         public string Unit { set; get; }
         /// <summary>
         /// 医嘱名称
@@ -75,10 +82,12 @@ namespace WiGeek.Domain.OrderAggregate
         /// </summary>
         [MaxLength(500)]
         public string Remark { get; set; }
+        public bool IsDel { get; set; }
         /// <summary>
         /// 执行病区
         /// </summary>        
-        public int? WardId { set; get; }
+        [MaxLength(50)]
+        public string WardId { set; get; }
         [NotMapped]
         public Ward Ward { get; set; }
         [NotMapped]

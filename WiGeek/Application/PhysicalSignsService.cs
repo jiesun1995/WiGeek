@@ -37,6 +37,7 @@ namespace WiGeek.Application
                 Breathe=dto.Breathe,
                 HeartRate=dto.HeartRate,
                 CreateTime=dto.CreateTime,
+                MedicalRecordsId=dto.HosMedicalRecordsId,
                 //MedicalRecordsId=dto.MedicalRecordsId,
             };
         }

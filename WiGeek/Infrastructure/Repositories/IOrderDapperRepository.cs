@@ -8,5 +8,7 @@ namespace WiGeek.Infrastructure.Repositories
     public interface IOrderDapperRepository
     {
         Task BulkCreatAsync(IList<Order> orders);
+        Task<IEnumerable<Order>> GetNotInMedicalRecords();
+        Task<int> DelNotInMedicalRecords();
     }
 }

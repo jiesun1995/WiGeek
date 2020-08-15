@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EFCore.BulkExtensions;
 using MediatR;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
@@ -103,10 +104,13 @@ namespace WiGeek.Application
                 PatientIdCardNo=dto.PatientIdCardNo,
                 HospitalCode=dto.HospitalCode,
                 HospitalId=dto.HospitalId,
-
+                DepartmentId=dto.HosDepartmentId,
+                MarriageId=dto.HosMarriageId,
+                DiagnosisId=dto.HosDiagnosisId,
+                WardId=dto.HosWardId,
+                WorkId=dto.HosWorkId,
             };
         }
-
         public void BulkCreat(List<CreateUpdateMedicalRecordsDto> dtos)
         {
             //var records = base.ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dtos[1]);
@@ -143,7 +147,7 @@ namespace WiGeek.Application
             Repository.GetDbContext().BulkInsertAsync(medicalRecords.ToList()).Wait();
             //await _medicalRecordsDapperRepository.BulkCreatAsync(medicalRecords.ToList());
         }
-
+        [RemoteService(IsEnabled = false)]
         public async Task BulkCreatAsync(List<CreateUpdateMedicalRecordsDto> dtos)
         {
             //var records = base.ObjectMapper.Map<CreateUpdateMedicalRecordsDto, MedicalRecords>(dtos[1]);
