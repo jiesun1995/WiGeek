@@ -375,15 +375,17 @@ namespace WiGeek.Application
 
         public void readData<T>(ref ConcurrentBag<T>  list, string FilePath) where T: class,new ()
         {
-            Dictionary<int, PropertyInfo> PropertyInfoCols = new Dictionary<int, PropertyInfo>();
+            var PropertyInfoCols = new Dictionary<int, PropertyInfo>();
+            var PropertyInfoColNames = new Dictionary<string, PropertyInfo>();
             Type type = typeof(T);
             foreach (var property in type.GetProperties())
             {
                 var colNumberAttribute = property.GetAttribute<ColNumberAttribute>();
                 if (colNumberAttribute != null)
-                {
                     PropertyInfoCols.Add(colNumberAttribute.ColNumber, property);
-                }
+                var colNameAttribute = property.GetAttribute<ColNameAttribute>();
+                if (colNameAttribute != null)
+                    PropertyInfoColNames.Add(colNameAttribute.ColName, property);
             }
             bool fisrt = true;
             using (TextFieldParser parser = new TextFieldParser(FilePath, Encoding.GetEncoding("GB2312")))
@@ -396,9 +398,15 @@ namespace WiGeek.Application
                     string[] fields = parser.ReadFields();
                     for (int i = 0; i < fields.Length; i++)
                     {
-                        if (fisrt)
-                            continue;
                         var field = fields[i];
+                        if (fisrt)
+                        {
+                            if (PropertyInfoColNames.ContainsKey(field.Trim()))
+                            {
+                                PropertyInfoCols.Add(i, PropertyInfoColNames[field]);
+                            }
+                            continue;
+                        }
                         if (PropertyInfoCols.ContainsKey(i))
                         {
                             try
@@ -423,7 +431,8 @@ namespace WiGeek.Application
                                 _logger.LogError($"{FilePath}:{PropertyInfoCols[i].Name} {field} :{ex.StackTrace}");
                                 throw ex;
                             }
-                        }
+                        }                        
+
                         if(obj is IHospitalId)
                         {
                             var hospitalId = obj as IHospitalId;

@@ -13,14 +13,17 @@ namespace WiGeekDbMigrations
     {
         private readonly WiGeekDbContext _dbContext;
 
-        public WiGeekDbSchemaMigrator(WiGeekDbContext dbContext)
+        public WiGeekDbSchemaMigrator(
+            WiGeekDbContext dbContext
+            )
         {
             _dbContext = dbContext;
         }
 
         public async Task MigrateAsync()
         {
-            await _dbContext.Database.MigrateAsync();
+            await _dbContext
+                .Database.MigrateAsync();
         }
     }
 }

@@ -10,35 +10,37 @@ namespace WiGeek.Application.Contracts
 {
     public class CreateUpdateOrderDto : CreateUpdateDomainBaseDto<OrderDto>
     {
+        [ColName("医嘱ID")]
+        public override string HospitalCode { get ; set ; }
         /// <summary>
         /// 就诊唯一ID
         /// </summary>
-        [ColNumber(1)]
+        [ColName("就诊唯一ID")]
         public string HosMedicalRecordsId { get; set; }
         /// <summary>
         /// 同组标识
         /// </summary>
-        [ColNumber(2)]
+        [ColName("同组标识")]
         public string GroupId { get; set; }
         /// <summary>
         /// 科室ID
         /// </summary>
-        [ColNumber(3)]
+        [ColName("科室ID")]
         public string HosDepartmentId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>
-        [ColNumber(4)]
+        [ColName("类型")]
         public string Type { set; get; }
         /// <summary>
         /// 医嘱类型
         /// </summary>
-        [ColNumber(5)]
+        [ColName("医嘱类型")]
         public string HosOrderTypeId { set; get; }
         /// <summary>
         /// 医嘱状态
         /// </summary>
-        [ColNumber(6)]
+        [ColName("状态")]
         public string HosOrderStatusId { get; set; }
         /// <summary>
         /// 状态
@@ -48,48 +50,49 @@ namespace WiGeek.Application.Contracts
         /// <summary>
         /// 开立时间
         /// </summary>
-        [ColNumber(7)]
+        [ColName("开立时间")]
         public DateTime? OpenTime { get; set; }
         /// <summary>
         /// 护士审核时间
         /// </summary>
-        [ColNumber(8)]
+        [ColName("护士审核时间")]
         public DateTime? NurseReviewTime { set; get; }
         /// <summary>
         /// 护士执行时间
         /// </summary>
-        [ColNumber(9)]
+        [ColName("护士执行时间")]
         public DateTime? NurseExecuteTime { set; get; }
-        /// <summary>
-        /// 用量
-        /// </summary>
-        [ColNumber(10)]
-        public string Dosage { get; set; }
+        
         /// <summary>
         /// <summary>
         /// 用量单位
         /// </summary>
-        [ColNumber(11)]
+        [ColName("用量单位")]
         public string Unit { set; get; }
         /// <summary>
         /// 执行时间
         /// </summary>
-        [ColNumber(12)]
+        [ColName("执行时间")]
         public DateTime? ExecuteTime { get; set; }
+        /// <summary>
+        /// 用量
+        /// </summary>
+        [ColName("用量")]
+        public string Dosage { get; set; }
         /// <summary>
         /// 医嘱名称
         /// </summary>
-        [ColNumber(13)]
+        [ColName("医嘱名称")]
         public string Name { set; get; }
         /// <summary>
         /// 医嘱备注
         /// </summary>
-        [ColNumber(14)]
+        [ColName("医嘱备注")]
         public string Remark { get; set; }
         /// <summary>
         /// 执行病区
         /// </summary>
-        [ColNumber(15)]
+        [ColName("执行病区")]
         public string HosWardId { set; get; }
     }
 }

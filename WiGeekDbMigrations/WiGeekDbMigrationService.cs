@@ -15,7 +15,8 @@ namespace WiGeekDbMigrations
         private readonly IWiGeekDbSchemaMigrator _dbSchemaMigrator;
 
         public WiGeekDbMigrationService(
-            IWiGeekDbSchemaMigrator dbSchemaMigrator)
+            IWiGeekDbSchemaMigrator dbSchemaMigrator
+            )
         {
             _dbSchemaMigrator = dbSchemaMigrator;
 
@@ -23,12 +24,9 @@ namespace WiGeekDbMigrations
         }
 
         public async Task MigrateAsync()
-        {
-            Logger.LogInformation("Started database migrations...");
-
+        {            
             Logger.LogInformation("Migrating database schema...");
             await _dbSchemaMigrator.MigrateAsync();
-
             Logger.LogInformation("Successfully completed database migrations.");
         }
     }
