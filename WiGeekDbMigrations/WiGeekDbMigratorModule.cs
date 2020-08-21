@@ -10,7 +10,7 @@ namespace WiGeekDbMigrations
 {
     [DependsOn(
         typeof(AbpAutofacModule),
-        typeof()
+//        typeof()
         typeof(WiGeekDbEntityFrameworkDbMigrationsModule)
         )]
     public class WiGeekDbMigratorModule : AbpModule

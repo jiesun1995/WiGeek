@@ -6,9 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -39,6 +42,7 @@ namespace WiGeek.Application
         private readonly IRepository<Order, int> _orderRepository;
         private readonly IRepository<PhysicalSigns, int> _physicalSignsRepository;
         private readonly IMedicalRecordsDapperRepository _medicalRecordsDapperRepository;
+        private readonly string _connectionString;
         public MedicalRecordsService(IRepository<Work, int> workRepository
             , IRepository<Marriage, int> marriageRepository
             , IRepository<MedicalRecords, int> repository
@@ -47,6 +51,7 @@ namespace WiGeek.Application
             , IRepository<PhysicalSigns, int> physicalSignsRepository
             , IRepository<Department, int> departmentRepository
             , IMedicalRecordsDapperRepository medicalRecordsDapperRepository
+            , IConfiguration configuration
             , IRepository<Ward, int> wardRepository) : base(repository)
         {
             _workRepository = workRepository;
@@ -57,6 +62,7 @@ namespace WiGeek.Application
             _orderRepository = orderRepository;
             _physicalSignsRepository = physicalSignsRepository;
             _medicalRecordsDapperRepository = medicalRecordsDapperRepository;
+            _connectionString = configuration.GetConnectionString("Default");
         }
 
         public override async Task<MedicalRecordsDto> CreateAsync(CreateUpdateMedicalRecordsDto input)
@@ -125,7 +131,7 @@ namespace WiGeek.Application
             //var diagnosis = await _diagnosisRepository.Where(x => x.HospitalId == dtos.First().HospitalId && dtos.Select(x => x.HosDiagnosisName).Distinct().Contains(x.HospitalCode)).ToListAsync();
 
             //Task.WaitAll(works, departments, marriages, wards, diagnosis);
-            
+
             Parallel.ForEach(dtos, dto =>
             {
                 //medicalRecord.Work = works.FirstOrDefault(x => x.HospitalCode == medicalRecord.WardId);
@@ -147,6 +153,7 @@ namespace WiGeek.Application
             Repository.GetDbContext().BulkInsertAsync(medicalRecords.ToList()).Wait();
             //await _medicalRecordsDapperRepository.BulkCreatAsync(medicalRecords.ToList());
         }
+
         [RemoteService(IsEnabled = false)]
         public async Task BulkCreatAsync(List<CreateUpdateMedicalRecordsDto> dtos)
         {

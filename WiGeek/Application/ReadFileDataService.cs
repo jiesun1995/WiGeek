@@ -1,23 +1,23 @@
 ﻿using Castle.Core.Internal;
 using EFCore.BulkExtensions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
+using NUglify.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Uow;
 using WiGeek.Application.Contracts;
 using WiGeek.Domain.DepartmentAggregate;
 using WiGeek.Domain.MarriageAggregate;
@@ -35,47 +35,31 @@ namespace WiGeek.Application
     public class ReadFileDataService: IReadFileDataService
     {
         private readonly FileInfo[] _fileInfos;
-        private readonly IRepository<Ward, int> _wardRepository;
-        private readonly IRepository<Work, int> _workRepository;
         private readonly IMedicalRecordsService _medicalRecordsService;
         private readonly IOrderService _orderService;
         private readonly IPhysicalSignsService _physicalSignsService;
-        private readonly IRepository<Marriage, int> _marriageRepository;
-        private readonly IRepository<Department, int> _departmentRepository;
-        private readonly IRepository<OrderType, int> _orderTypeRepository;
-        private readonly IRepository<OrderStatus, int> _orderStatusRepository;
-        private readonly IRepository<Order, int> _orderRepository;
-        private readonly IRepository<PhysicalSigns, int> _physicalSignsRepository;
-        private readonly IRepository<MedicalRecords, int> _medicalRecordsRepository;
-        private readonly WiGeekDbContext dbContext;
+        private readonly WiGeekDbContext _dbContext;
         private readonly Dictionary<string, string> _hoskey;
         private readonly ILogger<ReadFileDataService> _logger;
+        private readonly string _connectionString;
 
-        public ReadFileDataService(ILogger<ReadFileDataService> logger, IHostEnvironment hostEnvironment, IPhysicalSignsService physicalSignsService, IOrderService orderService, WiGeekDbContext _dbContext, IConfiguration configuration, IRepository<Ward, int> wardRepository, IRepository<Work, int> workRepository, IRepository<Marriage, int> marriageRepository, IRepository<Department, int> departmentRepository, IRepository<OrderType, int> orderTypeRepository, IRepository<OrderStatus, int> orderStatusRepository, IRepository<Order, int> orderRepository, IRepository<PhysicalSigns, int> physicalSignsRepository, IRepository<MedicalRecords, int> medicalRecordsRepository, IMedicalRecordsService medicalRecordsService)
+        public ReadFileDataService(IConfiguration configuration, IHostEnvironment hostEnvironment, IMedicalRecordsService medicalRecordsService, IOrderService orderService, IPhysicalSignsService physicalSignsService, WiGeekDbContext dbContext,  ILogger<ReadFileDataService> logger)
         {
-            var path = string.Empty;
-            //var path= configuration.GetValue<string>("RootPath");
+            string path;
+            _medicalRecordsService = medicalRecordsService;
+            _orderService = orderService;
+            _physicalSignsService = physicalSignsService;
+            _dbContext = dbContext;
+            _logger = logger;
+
             if (hostEnvironment.IsDevelopment())
                 //path = "C:\\data\\WiGeek样本数据20200729\\标准比赛数据集";
                 path = "E:\\work\\WiGeek\\WiGeek样本数据20200729\\标准比赛数据集";
             else
-                path = "D:\\wndata";
+                path = "D:\\wndata\\[公共素材]\\2020年第一届科技节样本素材\\WiGeek样本数据";
             var directoryInfo = new DirectoryInfo(path);
             _fileInfos = ReadFileInfos(directoryInfo);
-            _wardRepository = wardRepository;
-            _workRepository = workRepository;
-            _marriageRepository = marriageRepository;
-            _departmentRepository = departmentRepository;
-            _orderTypeRepository = orderTypeRepository;
-            _orderStatusRepository = orderStatusRepository;
-            _orderRepository = orderRepository;
-            _physicalSignsRepository = physicalSignsRepository;
-            _medicalRecordsRepository = medicalRecordsRepository;
-            _medicalRecordsService = medicalRecordsService;
-            dbContext = _dbContext;
-            _orderService = orderService;
-            _physicalSignsService = physicalSignsService;
-            _logger = logger;
+            _connectionString = configuration.GetConnectionString("Default");
             _hoskey = new Dictionary<string, string>
             {
                 {"医院数据1","0" },
@@ -96,7 +80,7 @@ namespace WiGeek.Application
                 if (!decimal.TryParse(strData, out dData))
                     return strData;
             }
-            return Math.Round(dData, 4).ToString();
+            return Math.Round(dData, 4).ToString(CultureInfo.InvariantCulture);
         }
         private FileInfo[] ReadFileInfos(DirectoryInfo directoryInfo)
         {
@@ -158,12 +142,12 @@ namespace WiGeek.Application
 
 
             });
-            dbContext.BulkInsert(wards.ToList());
-            dbContext.BulkInsert(works.ToList());
-            dbContext.BulkInsert(marriages.ToList());
-            dbContext.BulkInsert(departments.ToList());
-            dbContext.BulkInsert(orderTypes.ToList());
-            dbContext.BulkInsert(orderStatuses.ToList());
+            _dbContext.BulkInsert(wards.ToList());
+            _dbContext.BulkInsert(works.ToList());
+            _dbContext.BulkInsert(marriages.ToList());
+            _dbContext.BulkInsert(departments.ToList());
+            _dbContext.BulkInsert(orderTypes.ToList());
+            _dbContext.BulkInsert(orderStatuses.ToList());
 
         }
         private void ReadFileTwoLevel()
@@ -237,131 +221,250 @@ namespace WiGeek.Application
             //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
             //await _physicalSignsService.BulkCreatAsync(list.ToList());
         }
-        private async Task ReadFile()
+        private void ReadFile()
         {
-            var wards = new ConcurrentBag<Ward>();
-            var works = new ConcurrentBag<Work>();
-            var marriages = new ConcurrentBag<Marriage>();
-            var diagnoses = new ConcurrentBag<Diagnosis>();
-            var departments = new ConcurrentBag<Department>();
-            var orderTypes = new ConcurrentBag<OrderType>();
-            var orderStatuses = new ConcurrentBag<OrderStatus>();
-            var createUpdateMedicalRecords = new ConcurrentBag<CreateUpdateMedicalRecordsDto>();
-            var createUpdatePhysicalSigns = new ConcurrentBag<CreateUpdatePhysicalSignsDto>();
-            var createUpdateOrders = new ConcurrentBag<CreateUpdateOrderDto>();
+            //var wards = new ConcurrentBag<Ward>();
+            //var works = new ConcurrentBag<Work>();
+            //var marriages = new ConcurrentBag<Marriage>();
+            //var diagnoses = new ConcurrentBag<Diagnosis>();
+            //var departments = new ConcurrentBag<Department>();
+            //var orderTypes = new ConcurrentBag<OrderType>();
+            //var orderStatuses = new ConcurrentBag<OrderStatus>();
+            //var createUpdateMedicalRecords = new ConcurrentBag<CreateUpdateMedicalRecordsDto>();
+            //var createUpdatePhysicalSigns = new ConcurrentBag<CreateUpdatePhysicalSignsDto>();
+            //var createUpdateOrders = new ConcurrentBag<CreateUpdateOrderDto>();
 
+            //Parallel.ForEach(_fileInfos, fileInfo =>
             Parallel.ForEach(_fileInfos, fileInfo =>
-            //foreach (var fileInfo in _fileInfos)
             {
+                //var fileInfo = obj as FileInfo;
                 if (fileInfo.FullName.Contains("病区字典"))
                 {
-                    readData<Ward>(ref wards, fileInfo.FullName);
-                    //dbContext.BulkInsert(_wards.ToList());
+                    readAndWrite<Ward>(fileInfo.FullName, "Wards", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("工作字典"))
                 {
-                    readData<Work>(ref works, fileInfo.FullName);
-                    //using (var dbContext = _workRepository.GetDbContext())
-                    //dbContext.BulkInsert(_works.ToList());
+                    readAndWrite<Work>(fileInfo.FullName, "Works", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("诊断数据"))
                 {
-                    readData<Diagnosis>(ref diagnoses, fileInfo.FullName);
-                    //using (var dbContext = _workRepository.GetDbContext())
-                    //dbContext.BulkInsert(_works.ToList());
+                    readAndWrite<Diagnosis>(fileInfo.FullName, "Diagnoses", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("婚姻字典"))
                 {
-                    readData<Marriage>(ref marriages, fileInfo.FullName);
-                    //using (var dbContext = _marriageRepository.GetDbContext())
-                    //dbContext.BulkInsert(_marriages.ToList());
+                    readAndWrite<Marriage>(fileInfo.FullName, "Marriages", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("科室字典"))
                 {
-                    readData<Department>(ref departments, fileInfo.FullName);
-                    //using (var dbContext = _departmentRepository.GetDbContext())
-                    //dbContext.BulkInsert(_departments.ToList());
+                    readAndWrite<Department>(fileInfo.FullName, "Departments", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("医嘱项目类型字典"))
                 {
-                    readData<OrderType>(ref orderTypes, fileInfo.FullName);
-                    //using (var dbContext = _orderTypeRepository.GetDbContext())
-                    //dbContext.BulkInsert(_orderTypes.ToList());
+                    readAndWrite<OrderType>(fileInfo.FullName, "OrderTypes", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
                 else if (fileInfo.FullName.Contains("医嘱状态字典"))
                 {
-                    readData<OrderStatus>(ref orderStatuses, fileInfo.FullName);
-                    //using (var dbContext = _orderStatusRepository.GetDbContext())
-                    //dbContext.BulkInsert(_orderStatuses.ToList());
+                    readAndWrite<OrderStatus>(fileInfo.FullName, "OrderStatuses", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
-                else if (fileInfo.FullName.Contains("就诊记录"))
+                else
+                if (fileInfo.FullName.Contains("就诊记录"))
                 {
-                    readData<CreateUpdateMedicalRecordsDto>(ref createUpdateMedicalRecords, fileInfo.FullName);
-                    //_medicalRecordsService.BulkCreatAsync(_medicalRecords.ToList()).Wait();
-                    //list.Add(_medicalRecords);
+                    readAndWrite<MedicalRecords>(fileInfo.FullName, "MedicalRecords", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
-                else if (fileInfo.FullName.Contains("医嘱数据"))
+                else
+                if (fileInfo.FullName.Contains("医嘱数据"))
                 {
-                    //await readAndWrite<CreateUpdateOrderDto>(fileInfo.FullName, async data =>
-                    // {
-                    //     await _orderService.BulkCreatAsync(data.ToList());
-                    // });
-                    readData<CreateUpdateOrderDto>(ref createUpdateOrders, fileInfo.FullName);
-                    //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
+                    readAndWrite<Order>(fileInfo.FullName, "Orders", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
-                else if (fileInfo.FullName.Contains("体征数据"))
+                else
+                if (fileInfo.FullName.Contains("体征数据"))
                 {
-                    //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
-                    // {
-                    //     await _physicalSignsService.BulkCreatAsync(data.ToList());
-                    // },500000);
-                    readData<CreateUpdatePhysicalSignsDto>(ref createUpdatePhysicalSigns, fileInfo.FullName);
-                    //await _physicalSignsService.BulkCreatAsync(list.ToList());
+                    readAndWrite<PhysicalSigns>(fileInfo.FullName, "PhysicalSigns", (dt, maps) =>
+                    {
+                        return BulkCreat(dt, maps);
+                    }).Wait();
                 }
-                //}
             });
-            dbContext.BulkInsert(wards.ToList());
-            _logger.LogInformation($"完成病区字典数据导入，总共{wards.Count}条");
-            wards.Clear();
-            dbContext.BulkInsert(diagnoses.ToList());
-            _logger.LogInformation($"完成诊断字典数据导入,总共{diagnoses.Count}条");
-            diagnoses.Clear();
-            dbContext.BulkInsert(works.ToList());
-            _logger.LogInformation($"完成工作字典数据导入,总共{works.Count}条");
-            works.Clear();
-            dbContext.BulkInsert(marriages.ToList());
-            _logger.LogInformation($"完成婚姻字典数据导入,总共{marriages.Count}条");
-            marriages.Clear();
-            dbContext.BulkInsert(departments.ToList());
-            _logger.LogInformation($"完成科室字典数据导入,总共{departments.Count}条");
-            departments.Clear();
-            dbContext.BulkInsert(orderTypes.ToList());
-            _logger.LogInformation($"完成医嘱类型字典数据导入,总共{orderTypes.Count}条");
-            orderTypes.Clear();
-            dbContext.BulkInsert(orderStatuses.ToList());
-            _logger.LogInformation($"完成医嘱状态字典数据导入,总共{orderStatuses.Count}条");
-            orderStatuses.Clear();
-            _medicalRecordsService.BulkCreat(createUpdateMedicalRecords.ToList());
-            _logger.LogInformation($"完成就诊记录数据导入,总共{createUpdateMedicalRecords.Count}条");
-            createUpdateMedicalRecords.Clear();
-            await BulkCreatAsync(createUpdateOrders, async data =>
-            {
-                await _orderService.BulkCreatAsync(data.ToList());
-            });
-            _logger.LogInformation($"完成医嘱数据导入,总共{createUpdateOrders.Count}条");
-            createUpdateOrders.Clear();
-            await BulkCreatAsync(createUpdatePhysicalSigns, async data =>
-            {
-                await _physicalSignsService.BulkCreatAsync(data.ToList());
-            });
-            _logger.LogInformation($"完成体征数据导入,总共{createUpdatePhysicalSigns.Count}条");
-            createUpdatePhysicalSigns.Clear();
-            GC.Collect();
+            //_fileInfos.ForEach(fileInfo =>
+            //{
+            //    if (fileInfo.FullName.Contains("病区字典"))
+            //    {
+            //        readAndWrite<Ward>(fileInfo.FullName, "Wards", (dt, maps) =>
+            //         {
+            //             return BulkCreat(dt, maps);
+            //         }).Wait();
+            //        //readData<Ward>(ref wards, fileInfo.FullName);
+            //        //dbContext.BulkInsert(_wards.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("工作字典"))
+            //    {
+            //        readAndWrite<Work>(fileInfo.FullName, "Works", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<Work>(ref works, fileInfo.FullName);
+            //        //using (var dbContext = _workRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_works.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("诊断数据"))
+            //    {
+            //        readAndWrite<Diagnosis>(fileInfo.FullName, "Diagnoses", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<Diagnosis>(ref diagnoses, fileInfo.FullName);
+            //        //using (var dbContext = _workRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_works.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("婚姻字典"))
+            //    {
+            //        readAndWrite<Marriage>(fileInfo.FullName, "Marriages", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<Marriage>(ref marriages, fileInfo.FullName);
+            //        //using (var dbContext = _marriageRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_marriages.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("科室字典"))
+            //    {
+            //        readAndWrite<Department>(fileInfo.FullName, "Departments", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<Department>(ref departments, fileInfo.FullName);
+            //        //using (var dbContext = _departmentRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_departments.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("医嘱项目类型字典"))
+            //    {
+            //        readAndWrite<OrderType>(fileInfo.FullName, "OrderTypes", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<OrderType>(ref orderTypes, fileInfo.FullName);
+            //        //using (var dbContext = _orderTypeRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_orderTypes.ToList());
+            //    }
+            //    else if (fileInfo.FullName.Contains("医嘱状态字典"))
+            //    {
+            //        readAndWrite<OrderStatus>(fileInfo.FullName, "OrderStatuses", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<OrderStatus>(ref orderStatuses, fileInfo.FullName);
+            //        //using (var dbContext = _orderStatusRepository.GetDbContext())
+            //        //dbContext.BulkInsert(_orderStatuses.ToList());
+            //    }
+            //    else
+            //    if (fileInfo.FullName.Contains("就诊记录"))
+            //    {
+            //        readAndWrite<MedicalRecords>(fileInfo.FullName, "MedicalRecords", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //readData<CreateUpdateMedicalRecordsDto>(ref createUpdateMedicalRecords, fileInfo.FullName);
+            //        //_medicalRecordsService.BulkCreatAsync(_medicalRecords.ToList()).Wait();
+            //        //list.Add(_medicalRecords);
+            //    }
+            //    else
+            //    if (fileInfo.FullName.Contains("医嘱数据"))
+            //    {
+            //        readAndWrite<Order>(fileInfo.FullName, "Orders", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //await readAndWrite<CreateUpdateOrderDto>(fileInfo.FullName, async data =>
+            //        // {
+            //        //     await _orderService.BulkCreatAsync(data.ToList());
+            //        // });
+            //        //readData<CreateUpdateOrderDto>(ref createUpdateOrders, fileInfo.FullName);
+            //        //await _orderService.BulkCreatAsync(createUpdateOrders.ToList());
+            //    }
+            //    else
+            //    if (fileInfo.FullName.Contains("体征数据"))
+            //    {
+            //        readAndWrite<PhysicalSigns>(fileInfo.FullName, "PhysicalSigns", (dt, maps) =>
+            //        {
+            //            return BulkCreat(dt, maps);
+            //        }).Wait();
+            //        //await readAndWrite<CreateUpdatePhysicalSignsDto>(fileInfo.FullName, async data =>
+            //        // {
+            //        //     await _physicalSignsService.BulkCreatAsync(data.ToList());
+            //        // },500000);
+            //        //readData<CreateUpdatePhysicalSignsDto>(ref createUpdatePhysicalSigns, fileInfo.FullName);
+            //        //await _physicalSignsService.BulkCreatAsync(list.ToList());
+            //    }
+            //});
+            //_dbContext.BulkInsert(wards.ToList());
+            //_logger.LogInformation($"完成病区字典数据导入，总共{wards.Count}条");
+            //wards.Clear();
+            //_dbContext.BulkInsert(diagnoses.ToList());
+            //_logger.LogInformation($"完成诊断字典数据导入,总共{diagnoses.Count}条");
+            //diagnoses.Clear();
+            //_dbContext.BulkInsert(works.ToList());
+            //_logger.LogInformation($"完成工作字典数据导入,总共{works.Count}条");
+            //works.Clear();
+            //_dbContext.BulkInsert(marriages.ToList());
+            //_logger.LogInformation($"完成婚姻字典数据导入,总共{marriages.Count}条");
+            //marriages.Clear();
+            //_dbContext.BulkInsert(departments.ToList());
+            //_logger.LogInformation($"完成科室字典数据导入,总共{departments.Count}条");
+            //departments.Clear();
+            //_dbContext.BulkInsert(orderTypes.ToList());
+            //_logger.LogInformation($"完成医嘱类型字典数据导入,总共{orderTypes.Count}条");
+            //orderTypes.Clear();
+            //_dbContext.BulkInsert(orderStatuses.ToList());
+            //_logger.LogInformation($"完成医嘱状态字典数据导入,总共{orderStatuses.Count}条");
+            //orderStatuses.Clear();
+            //_medicalRecordsService.BulkCreat(createUpdateMedicalRecords.ToList());
+            //_logger.LogInformation($"完成就诊记录数据导入,总共{createUpdateMedicalRecords.Count}条");
+            //createUpdateMedicalRecords.Clear();
+            //await BulkCreatAsync(createUpdateOrders, async data =>
+            //{
+            //    await _orderService.BulkCreatAsync(data.ToList());
+            //});
+            //_logger.LogInformation($"完成医嘱数据导入,总共{createUpdateOrders.Count}条");
+            //createUpdateOrders.Clear();
+            //await BulkCreatAsync(createUpdatePhysicalSigns, async data =>
+            //{
+            //    await _physicalSignsService.BulkCreatAsync(data.ToList());
+            //});
+            //_logger.LogInformation($"完成体征数据导入,总共{createUpdatePhysicalSigns.Count}条");
+            //createUpdatePhysicalSigns.Clear();
+            //GC.Collect();
         }
         public void ReadFileWriteData()
         {
             _logger.LogInformation("开始数据导入");
-            ReadFile().Wait();
+            ReadFile();
             _logger.LogInformation("数据导入完成");
         }
         public void ReadFileWriteDataByLevel()
@@ -431,7 +534,7 @@ namespace WiGeek.Application
                                 _logger.LogError($"{FilePath}:{PropertyInfoCols[i].Name} {field} :{ex.StackTrace}");
                                 throw ex;
                             }
-                        }                        
+                        }
 
                         if(obj is IHospitalId)
                         {
@@ -516,6 +619,161 @@ namespace WiGeek.Application
                     list.Clear();
                 }
             }            
+        }
+
+        private DataTable CreatDataTable<T>(string tableName,out List<SqlBulkCopyColumnMapping> maps,out Dictionary<int, PropertyInfo> propertyInfoCols, out Dictionary<string, PropertyInfo> PropertyInfoColNames) where T : class, new()
+        {
+            DataTable dataTable = new DataTable(tableName);
+            maps = new List<SqlBulkCopyColumnMapping>();
+            propertyInfoCols = new Dictionary<int, PropertyInfo>();
+            PropertyInfoColNames = new Dictionary<string, PropertyInfo>();
+            Type type = typeof(T);
+
+            var obj = new T();
+
+            if (obj is IHospitalId)
+            {
+                dataTable.Columns.Add(new DataColumn("HospitalId", typeof(int)));
+                maps.Add(new SqlBulkCopyColumnMapping("HospitalId", "HospitalId"));
+            }
+            if (obj is IIsDel)
+            {
+                dataTable.Columns.Add(new DataColumn("IsDel", typeof(int)));
+                maps.Add(new SqlBulkCopyColumnMapping("IsDel", "IsDel"));
+            }
+            foreach (var property in type.GetProperties())
+            {
+                var colNumberAttribute = property.GetAttribute<ColNumberAttribute>();
+                if (colNumberAttribute != null)
+                {
+                    propertyInfoCols.Add(colNumberAttribute.ColNumber, property);
+                    if (property.PropertyType == typeof(DateTime?))
+                        dataTable.Columns.Add(new DataColumn(property.Name, typeof(DateTime)));
+                    else if (property.PropertyType == typeof(int?))
+                    {
+                        dataTable.Columns.Add(new DataColumn(property.Name, typeof(int)));
+                    }
+                    else
+                        dataTable.Columns.Add(new DataColumn(property.Name, property.PropertyType));
+                    maps.Add(new SqlBulkCopyColumnMapping(property.Name, property.Name));
+                }
+                var colNameAttribute = property.GetAttribute<ColNameAttribute>();
+                if (colNameAttribute != null)
+                {
+                    PropertyInfoColNames.Add(colNameAttribute.ColName, property);
+                    if (property.PropertyType == typeof(DateTime?))
+                        dataTable.Columns.Add(new DataColumn(property.Name, typeof(DateTime)));
+                    else if (property.PropertyType == typeof(int?))
+                    {
+                        dataTable.Columns.Add(new DataColumn(property.Name, typeof(int)));
+                    }
+                    else
+                        dataTable.Columns.Add(new DataColumn(property.Name, property.PropertyType));
+                    maps.Add(new SqlBulkCopyColumnMapping(property.Name, property.Name));
+                }
+            }
+            return dataTable;
+        }
+
+        public async Task readAndWrite<T>(string FilePath,string tableName, Func<DataTable,List<SqlBulkCopyColumnMapping>,Task> write, int length = 200000) where T : class, new()
+        {
+            Task task=Task.CompletedTask;
+            _logger.LogInformation($"{FilePath}:开始导入");
+            var dataTable = CreatDataTable<T>(tableName, out List<SqlBulkCopyColumnMapping> maps, out Dictionary<int, PropertyInfo> propertyInfoCols, out Dictionary<string, PropertyInfo> PropertyInfoColNames);
+            bool fisrt = true;
+            using (TextFieldParser parser = new TextFieldParser(FilePath, Encoding.GetEncoding("GB2312")))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    var dr= dataTable.NewRow();
+                    string[] fields = parser.ReadFields();
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        var field = fields[i];
+                        if (fisrt)
+                        {
+                             if (PropertyInfoColNames.ContainsKey(field.Trim()))
+                            {
+                                propertyInfoCols.Add(i, PropertyInfoColNames[field.Trim()]);
+                            }
+                            continue;
+                        }
+                        if (propertyInfoCols.ContainsKey(i))
+                        {
+                            DataColumn col = dataTable.Columns[propertyInfoCols[i].Name];
+                            if (col.DataType == typeof(DateTime))
+                            {
+                                if (DateTime.TryParse(field, out DateTime dt))
+                                    dr[propertyInfoCols[i].Name] = dt;
+                            }
+                            else if (col.DataType == typeof(int))
+                            {
+                                if (int.TryParse(field, out int number))
+                                    dr[propertyInfoCols[i].Name] = number;
+                            }
+                            else if (propertyInfoCols[i].GetAttribute<IdCardAttribute>() != null)
+                            {
+                                dr[propertyInfoCols[i].Name] = ChangeToDecimal(field);
+                            }
+                            else
+                                dr[propertyInfoCols[i].Name] = field;
+                        }
+                        if (dataTable.Columns.Contains("HospitalId"))
+                        {
+                            var key = _hoskey.Keys.FirstOrDefault(x => FilePath.Contains(x));
+                            if (_hoskey.Keys.Any(x => FilePath.Contains(x)))
+                            {
+                                dr["HospitalId"] = _hoskey[key];
+                            }
+                        }
+                        if (dataTable.Columns.Contains("IsDel"))
+                        {
+                            dr["IsDel"] = 0;
+                        }
+                    }
+                    if (!fisrt)
+                    {
+                        dataTable.Rows.Add(dr);
+                        if (dataTable.Rows.Count >= length)
+                        {
+                            await task;
+                            task = write(dataTable, maps);
+                            dataTable = dataTable.Clone();
+                            //dataTable = CreatDataTable<T>(tableName, out maps, out propertyInfoCols, out PropertyInfoColNames);
+                        }
+                    }
+                    fisrt = false;
+                }
+                if (dataTable.Rows.Count > 0)
+                {
+                    await task;
+                    task = write(dataTable, maps);
+                    await task;                    
+                }
+            }
+            _logger.LogInformation($"{FilePath}:导入完成");
+            //dataTable.Dispose();
+        }
+
+        public Task BulkCreat(DataTable dt,List<SqlBulkCopyColumnMapping> columnMappings)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                using (SqlConnection con = new SqlConnection(_connectionString))
+                {
+                    SqlBulkCopy bulkCopy = new SqlBulkCopy(con)
+                    {
+                        DestinationTableName = dt.TableName,
+                        BatchSize = dt.Rows.Count,
+                        BulkCopyTimeout = 0,
+                    };
+                    columnMappings.ForEach(x => bulkCopy.ColumnMappings.Add(x));
+                    con.Open();
+                    bulkCopy.WriteToServer(dt);
+                }
+            });
         }
 
     }

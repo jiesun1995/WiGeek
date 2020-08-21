@@ -8,7 +8,7 @@ using WiGeek.Infrastructure.Attributes;
 
 namespace WiGeek.Domain.ValueObject
 {
-    public class OrderStatus: AggregateRoot<int>
+    public class OrderStatus: Entity<int>
     {
         [ColNumber(0)]
         [MaxLength(50)]

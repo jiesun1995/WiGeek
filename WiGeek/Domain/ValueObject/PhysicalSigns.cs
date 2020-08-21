@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WiGeek.Domain.MedicalRecordsAggregate;
 using WiGeek.Domain.SeedWork;
+using WiGeek.Infrastructure.Attributes;
 
 namespace WiGeek.Domain.ValueObject
 {
@@ -16,13 +17,19 @@ namespace WiGeek.Domain.ValueObject
     [Dapper.Contrib.Extensions.Table("PhysicalSigns")]
     public class PhysicalSigns : HospitalAggregateRoot,IIsDel
     {
+        public override string HospitalCode { get; set; }
         [MaxLength(50)]
+        [ColNumber(0)]
         public string MedicalRecordsId { get; set; }
+        [ColNumber(1)]
         public DateTime? CreateTime { get; set; }
+        [ColNumber(2)]
         public string Breathe { set; get; }
         [MaxLength(50)]
+        [ColNumber(3)]
         public string HeartRate { set; get; }
         [MaxLength(50)]
+        [ColNumber(4)]
         public string Temperature { get; set; }
         public bool IsDel { get; set; }
         [Computed]

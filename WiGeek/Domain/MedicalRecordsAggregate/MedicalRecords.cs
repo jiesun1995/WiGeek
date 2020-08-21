@@ -70,55 +70,66 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// 工作
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(1)]
         public string WorkId { get; set; }
         /// <summary>
         /// 婚姻
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(2)]
         public string MarriageId { set; get; }
         /// <summary>
         /// 科室ID
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(3)]
         public string DepartmentId { get; set; }
         /// <summary>
         /// 入院时间
         /// </summary>
+        [ColNumber(4)]
         public DateTime? AdmissionTime { set; get; }
         /// <summary>
         /// 住院号
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(5)]
         public string HospitalNo { get; set; }
         /// <summary>
         /// 姓名
         /// </summary>
         [MaxLength(500)]
+        [ColNumber(6)]
         public string PatientName { set; get; }
         /// <summary>
         /// 过滤码
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(7)]
         public string InputCode { get; set; }
         /// <summary>
         /// 性别
         /// </summary>
         [MaxLength(10)]
+        [ColNumber(8)]
         public string Sex { get; set; }
         /// <summary>
         /// 出生日期
         /// </summary>
+        [ColNumber(9)]
         public DateTime? Birthday { get; set; }
         /// <summary>
         /// 身份证号
         /// </summary>
         [MaxLength(18)]
         [IdCard]
+        [ColNumber(10)]
         public string PatientIdCardNo { get; set; }
         /// <summary>
         /// 主要诊断
         /// </summary>
         [MaxLength(500)]
+        [ColNumber(11)]
         public string DiagnosisName { get; set; }
         /// <summary>
         /// 诊断Id
@@ -128,26 +139,31 @@ namespace WiGeek.Domain.MedicalRecordsAggregate
         /// <summary>
         /// 出院日期
         /// </summary>        
+        [ColNumber(12)]        
         public DateTime? DischargedTime { get; set; }
         /// <summary>
         /// 病区ID
         /// </summary>
         [MaxLength(50)]
+        [ColNumber(13)]
         public string WardId { get; set; }
         /// <summary>
         /// 联系人
         /// </summary>
         [MaxLength(500)]
+        [ColNumber(14)]
         public string ContactPerson { get; set; }
         /// <summary>
         /// 联系人电话
         /// </summary>
         [MaxLength(100)]
+        [ColNumber(15)]
         public string ContactPhone { get; set; }
         /// <summary>
         /// 家庭住址
         /// </summary>
         [MaxLength(500)]
+        [ColNumber(16)]
         public string Add { get; set; }
         [Computed]
         [NotMapped]
